@@ -2,6 +2,7 @@ package com.example.learnwave.enums;
 
 public enum TipoUsuario {
     ALUNO("aluno"),
+    ESTUDANTE("estudante"),
     PROFESSOR("professor"),
     ADMINISTRADOR("administrador");
 

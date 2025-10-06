@@ -19,7 +19,6 @@ public interface MaterialDAO {
     List<Material> buscarPorProfessor(Integer professorId);
     List<Material> buscarPorArea(String area);
     List<Material> buscarPorStatus(StatusConteudo status);
-    List<Material> buscarPorStatus(String status);
     List<Material> buscarPublicados();
     List<Material> buscarPorAreaEStatus(String area, StatusConteudo status);
     List<Material> buscarPorTipoArquivo(String tipoArquivo);

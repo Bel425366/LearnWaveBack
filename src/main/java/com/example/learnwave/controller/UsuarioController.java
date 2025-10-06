@@ -20,6 +20,7 @@ public class UsuarioController {
     // CADASTRAR usuário
     @PostMapping
     public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody Usuario usuario) {
+        System.out.println("Received usuario: " + usuario.getNome() + ", tipo: " + usuario.getTipo());
         validarDadosObrigatorios(usuario);
         Usuario usuarioCriado = usuarioService.criarUsuario(usuario);
         return ResponseEntity.ok(usuarioCriado);
@@ -81,21 +82,21 @@ public class UsuarioController {
     @PostMapping("/login")
     public ResponseEntity<Usuario> login(@RequestParam String email, @RequestParam String senha) {
         if (email == null || email.trim().isEmpty()) {
-            throw new RuntimeException("Email é obrigatório");
+            throw new RuntimeException("Email e obrigatorio");
         }
         if (senha == null || senha.trim().isEmpty()) {
-            throw new RuntimeException("Senha é obrigatória");
+            throw new RuntimeException("Senha e obrigatoria");
         }
-        
+
         Usuario usuario = usuarioService.autenticar(email, senha);
         if (usuario == null) {
             return ResponseEntity.badRequest().build();
         }
-        
+
         if ("inativo".equals(usuario.getStatus())) {
-            throw new RuntimeException("Usuário inativo");
+            throw new RuntimeException("Usuario inativo");
         }
-        
+
         return ResponseEntity.ok(usuario);
     }
 
@@ -154,16 +155,16 @@ public class UsuarioController {
     // Validações
     private void validarDadosObrigatorios(Usuario usuario) {
         if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
-            throw new RuntimeException("Nome é obrigatório");
+            throw new RuntimeException("Nome e obrigatorio");
         }
         if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
-            throw new RuntimeException("Email é obrigatório");
+            throw new RuntimeException("Email e obrigatorio");
         }
         if (usuario.getSenha() == null || usuario.getSenha().trim().isEmpty()) {
-            throw new RuntimeException("Senha é obrigatória");
+            throw new RuntimeException("Senha e obrigatoria");
         }
         if (usuario.getTipo() == null) {
-            throw new RuntimeException("Tipo de usuário é obrigatório");
+            throw new RuntimeException("Tipo de usuario e obrigatorio");
         }
     }
 }

@@ -51,7 +51,8 @@ public class AtividadeService {
     }
 
     public List<Atividade> buscarPorStatus(String status) {
-        return atividadeDAO.buscarPorStatus(status);
+        StatusConteudo statusEnum = StatusConteudo.fromString(status);
+        return atividadeDAO.buscarPorStatus(statusEnum);
     }
 
     public boolean voltarParaRascunho(Integer id) {

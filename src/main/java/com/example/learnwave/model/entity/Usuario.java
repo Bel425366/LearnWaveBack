@@ -2,6 +2,10 @@ package com.example.learnwave.model.entity;
 
 import com.example.learnwave.enums.StatusVerificacao;
 import com.example.learnwave.enums.TipoUsuario;
+import com.example.learnwave.config.TipoUsuarioDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -21,6 +25,9 @@ public class Usuario {
     private String senha;
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_usuario", nullable = false)
+    @JsonDeserialize(using = TipoUsuarioDeserializer.class)
+    @JsonProperty("tipo")
+    @JsonAlias({"tipoUsuario", "tipo_usuario", "userType"})
     private TipoUsuario tipo;
     private String cpf;
     private String telefone;
@@ -83,6 +90,12 @@ public class Usuario {
 
     public TipoUsuario getTipo() { return tipo; }
     public void setTipo(TipoUsuario tipo) { this.tipo = tipo; }
+    
+    public void setTipoFromString(String tipoStr) {
+        if (tipoStr != null && !tipoStr.trim().isEmpty()) {
+            this.tipo = TipoUsuario.fromString(tipoStr);
+        }
+    }
 
     public String getCpf() { return cpf; }
     public void setCpf(String cpf) { this.cpf = cpf; }

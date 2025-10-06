@@ -91,8 +91,5 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         return new ArrayList<>();
     }
 
-    @Override
-    public List<Atividade> buscarPorStatus(String status) {
-        return new ArrayList<>();
-    }
+
 }

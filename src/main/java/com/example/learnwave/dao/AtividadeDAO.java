@@ -19,7 +19,6 @@ public interface AtividadeDAO {
     List<Atividade> buscarPorProfessor(Integer professorId);
     List<Atividade> buscarPorArea(String area);
     List<Atividade> buscarPorStatus(StatusConteudo status);
-    List<Atividade> buscarPorStatus(String status);
     List<Atividade> buscarPublicadas();
     List<Atividade> buscarPorAreaEStatus(String area, StatusConteudo status);
 

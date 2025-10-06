@@ -23,7 +23,7 @@ public class UsuarioService {
         if (usuario.getCpf() != null && usuarioDAO.existeCpf(usuario.getCpf())) {
             throw new RuntimeException("CPF já cadastrado");
         }
-        
+
         // Definir valores padrão
         if (usuario.getStatus() == null) {
             usuario.setStatus("ativo");
@@ -33,7 +33,7 @@ public class UsuarioService {
         }
         usuario.setDataCriacao(LocalDateTime.now());
         usuario.setDataAtualizacao(LocalDateTime.now());
-        
+
         return usuarioDAO.salvar(usuario);
     }
 
@@ -62,13 +62,13 @@ public class UsuarioService {
         if (usuarioExistente == null) {
             throw new RuntimeException("Usuário não encontrado");
         }
-        
+
         // Verificar se email já existe para outro usuário
         Usuario usuarioComEmail = usuarioDAO.buscarPorEmail(usuario.getEmail());
         if (usuarioComEmail != null && !usuarioComEmail.getId().equals(usuario.getId())) {
             throw new RuntimeException("Email já cadastrado para outro usuário");
         }
-        
+
         usuario.setDataAtualizacao(LocalDateTime.now());
         return usuarioDAO.atualizar(usuario);
     }
@@ -78,7 +78,7 @@ public class UsuarioService {
         if (usuario == null) {
             throw new RuntimeException("Usuário não encontrado");
         }
-        
+
         if ("ativo".equals(status)) {
             usuarioDAO.ativarUsuario(id);
         } else {

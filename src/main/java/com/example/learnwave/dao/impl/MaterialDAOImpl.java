@@ -81,10 +81,7 @@ public class MaterialDAOImpl implements MaterialDAO {
         return true;
     }
 
-    @Override
-    public List<Material> buscarPorStatus(String status) {
-        return new ArrayList<>();
-    }
+
 
     @Override
     public List<Material> buscarPublicados() {

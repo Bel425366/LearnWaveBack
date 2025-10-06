@@ -50,7 +50,8 @@ public class MaterialService {
     }
 
     public List<Material> buscarPorStatus(String status) {
-        return materialDAO.buscarPorStatus(status);
+        StatusConteudo statusEnum = StatusConteudo.fromString(status);
+        return materialDAO.buscarPorStatus(statusEnum);
     }
 
     public List<Material> buscarPorTipoArquivo(String tipo) {

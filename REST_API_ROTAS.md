@@ -95,23 +95,23 @@
 ```javascript
 // Cadastrar usuário
 fetch('/api/usuarios', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    nome: 'João Silva',
-    email: 'joao@email.com',
-    senha: '123456',
-    tipo: 'ALUNO'
-  })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        nome: 'João Silva',
+        email: 'joao@email.com',
+        senha: '123456',
+        tipo: 'ALUNO'
+    })
 });
 
 // Login
 fetch('/api/usuarios/login?email=joao@email.com&senha=123456', {
-  method: 'POST'
+    method: 'POST'
 });
 
 // Listar atividades
 fetch('/api/atividades')
-  .then(response => response.json())
-  .then(data => console.log(data));
+    .then(response => response.json())
+    .then(data => console.log(data));
 ```

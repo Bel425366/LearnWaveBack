@@ -1,9 +1,9 @@
 package com.example.learnwave.dao;
 
 
- import com.example.learnwave.enums.StatusVerificacao;
- import com.example.learnwave.enums.TipoUsuario;
- import com.example.learnwave.model.entity.Usuario;
+import com.example.learnwave.enums.StatusVerificacao;
+import com.example.learnwave.enums.TipoUsuario;
+import com.example.learnwave.model.entity.Usuario;
 
 import java.util.List;
 
