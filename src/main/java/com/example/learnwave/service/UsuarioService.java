@@ -6,6 +6,7 @@ import com.example.learnwave.enums.TipoUsuario;
 import com.example.learnwave.model.entity.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,24 +18,45 @@ public class UsuarioService {
     private UsuarioDAO usuarioDAO;
 
     public Usuario criarUsuario(Usuario usuario) {
-        if (usuarioDAO.existeEmail(usuario.getEmail())) {
-            throw new RuntimeException("Email já cadastrado");
-        }
-        if (usuario.getCpf() != null && usuarioDAO.existeCpf(usuario.getCpf())) {
-            throw new RuntimeException("CPF já cadastrado");
-        }
+        try {
+            System.out.println("=== CRIANDO USUÁRIO ===");
+            System.out.println("Tipo recebido: " + usuario.getTipo());
+            
+            if (usuarioDAO.existeEmail(usuario.getEmail())) {
+                throw new RuntimeException("Email já cadastrado");
+            }
+            if (usuario.getCpf() != null && usuarioDAO.existeCpf(usuario.getCpf())) {
+                throw new RuntimeException("CPF já cadastrado");
+            }
 
-        // Definir valores padrão
-        if (usuario.getStatus() == null) {
-            usuario.setStatus("ativo");
-        }
-        if (usuario.getStatusVerificacao() == null) {
-            usuario.setStatusVerificacao(StatusVerificacao.PENDENTE);
-        }
-        usuario.setDataCriacao(LocalDateTime.now());
-        usuario.setDataAtualizacao(LocalDateTime.now());
+            // Definir valores padrão
+            if (usuario.getStatus() == null) {
+                usuario.setStatus("ativo");
+            }
+            
+            // Forçar status baseado no tipo
+            if (TipoUsuario.ALUNO.equals(usuario.getTipo()) || 
+                TipoUsuario.ESTUDANTE.equals(usuario.getTipo()) || 
+                TipoUsuario.ADMIN.equals(usuario.getTipo()) || 
+                TipoUsuario.ADMINISTRADOR.equals(usuario.getTipo())) {
+                usuario.setStatusVerificacao(StatusVerificacao.APROVADO);
+                System.out.println("Status definido como APROVADO");
+            } else {
+                usuario.setStatusVerificacao(StatusVerificacao.PENDENTE);
+                System.out.println("Status definido como PENDENTE");
+            }
+            
+            usuario.setDataCriacao(LocalDateTime.now());
+            usuario.setDataAtualizacao(LocalDateTime.now());
 
-        return usuarioDAO.salvar(usuario);
+            Usuario usuarioSalvo = usuarioDAO.salvar(usuario);
+            System.out.println("Usuário salvo com status: " + usuarioSalvo.getStatusVerificacao());
+            return usuarioSalvo;
+        } catch (Exception e) {
+            System.err.println("ERRO AO CRIAR USUÁRIO: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public Usuario buscarPorId(Integer id) {
@@ -74,16 +96,20 @@ public class UsuarioService {
     }
 
     public void alterarStatus(Integer id, String status) {
+        System.out.println("Service: Alterando status do usuário ID: " + id + " para: " + status);
         Usuario usuario = usuarioDAO.buscarPorId(id);
         if (usuario == null) {
+            System.out.println("Service: Usuário não encontrado com ID: " + id);
             throw new RuntimeException("Usuário não encontrado");
         }
 
+        System.out.println("Service: Usuário encontrado: " + usuario.getEmail() + ", status atual: " + usuario.getStatus());
         if ("ativo".equals(status)) {
             usuarioDAO.ativarUsuario(id);
         } else {
             usuarioDAO.desativarUsuario(id);
         }
+        System.out.println("Service: Operação concluída");
     }
 
     public boolean deletar(Integer id) {
@@ -91,15 +117,20 @@ public class UsuarioService {
     }
 
     public List<Usuario> listarProfessoresPendentes() {
-        return usuarioDAO.buscarPorStatusVerificacao(StatusVerificacao.PENDENTE);
+        return usuarioDAO.buscarProfessoresPendentes();
     }
 
+    @Transactional
     public boolean aprovarProfessor(Integer id) {
+        System.out.println("Service: Aprovando professor ID: " + id);
         return usuarioDAO.aprovarProfessor(id);
     }
 
     public boolean rejeitarProfessor(Integer id) {
-        return usuarioDAO.rejeitarProfessor(id);
+        System.out.println("Service: Rejeitando professor ID: " + id);
+        boolean resultado = usuarioDAO.rejeitarProfessor(id);
+        System.out.println("Service: Resultado da rejeição: " + resultado);
+        return resultado;
     }
 
     public Usuario autenticar(String email, String senha) {
@@ -118,10 +149,6 @@ public class UsuarioService {
 
     public List<Usuario> buscarPorAreaEnsino(String area) {
         return usuarioDAO.buscarPorAreaEnsino(area);
-    }
-
-    public List<Usuario> buscarPorDisciplina(String disciplina) {
-        return usuarioDAO.buscarPorDisciplina(disciplina);
     }
 
     public List<Usuario> buscarPorEscola(String escola) {

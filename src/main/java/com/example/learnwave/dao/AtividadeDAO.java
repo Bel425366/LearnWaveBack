@@ -8,14 +8,14 @@ import java.util.List;
 
 public interface AtividadeDAO {
 
-    // Operações CRUD básicas
+
     Atividade salvar(Atividade atividade);
     Atividade buscarPorId(Integer id);
     List<Atividade> listarTodas();
     Atividade atualizar(Atividade atividade);
     boolean deletar(Integer id);
 
-    // Consultas específicas
+
     List<Atividade> buscarPorProfessor(Integer professorId);
     List<Atividade> buscarPorArea(String area);
     List<Atividade> buscarPorStatus(StatusConteudo status);

@@ -6,8 +6,10 @@ import com.example.learnwave.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -19,12 +21,28 @@ public class UsuarioController {
 
     // CADASTRAR usuário
     @PostMapping
-    public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody Usuario usuario) {
-        System.out.println("Received usuario: " + usuario.getNome() + ", tipo: " + usuario.getTipo());
-        validarDadosObrigatorios(usuario);
-        Usuario usuarioCriado = usuarioService.criarUsuario(usuario);
-        return ResponseEntity.ok(usuarioCriado);
+    public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
+        try {
+            System.out.println("=== CONTROLLER CADASTRO ===");
+            System.out.println("Nome: " + usuario.getNome());
+            System.out.println("Email: " + usuario.getEmail());
+            System.out.println("Tipo recebido: " + usuario.getTipo());
+            System.out.println("Status atual: " + usuario.getStatusVerificacao());
+            
+            validarDadosObrigatorios(usuario);
+            Usuario usuarioCriado = usuarioService.criarUsuario(usuario);
+            
+            System.out.println("Usuario criado com status: " + usuarioCriado.getStatusVerificacao());
+            System.out.println("=== FIM CONTROLLER ===");
+            return ResponseEntity.ok(usuarioCriado);
+        } catch (Exception e) {
+            System.err.println("ERRO NO CADASTRO: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
+
+
 
     // PESQUISAR usuários
     @GetMapping("/{id}")
@@ -63,6 +81,7 @@ public class UsuarioController {
     // ALTERAR usuário
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Integer id, @RequestBody Usuario usuario) {
+        System.out.println("Atualizando usuario ID: " + id);
         usuario.setId(id);
         validarDadosObrigatorios(usuario);
         Usuario usuarioAtualizado = usuarioService.atualizar(usuario);
@@ -71,16 +90,20 @@ public class UsuarioController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> alterarStatus(@PathVariable Integer id, @RequestParam String status) {
+        System.out.println("Controller: Alterando status do usuário ID: " + id + " para: " + status);
         if (!"ativo".equals(status) && !"inativo".equals(status)) {
             throw new RuntimeException("Status deve ser 'ativo' ou 'inativo'");
         }
         usuarioService.alterarStatus(id, status);
+        System.out.println("Controller: Status alterado com sucesso");
         return ResponseEntity.ok().build();
     }
 
     // LOGAR usuário
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@RequestParam String email, @RequestParam String senha) {
+    public ResponseEntity<Usuario> login(@RequestParam String email, @RequestParam String senha, @RequestParam(required = false) String tipoUsuario) {
+        System.out.println("Login attempt - Email: " + email + ", TipoUsuario: " + tipoUsuario);
+        
         if (email == null || email.trim().isEmpty()) {
             throw new RuntimeException("Email e obrigatorio");
         }
@@ -89,14 +112,30 @@ public class UsuarioController {
         }
 
         Usuario usuario = usuarioService.autenticar(email, senha);
+        System.out.println("Usuario encontrado: " + (usuario != null ? usuario.getEmail() + ", Status: " + usuario.getStatus() + ", Verificacao: " + usuario.getStatusVerificacao() : "null"));
+        
         if (usuario == null) {
+            System.out.println("Usuario nao encontrado ou senha incorreta");
             return ResponseEntity.badRequest().build();
         }
 
-        if ("inativo".equals(usuario.getStatus())) {
-            throw new RuntimeException("Usuario inativo");
+        // Verificar status de verificação do professor ANTES de checar status geral
+        if (TipoUsuario.PROFESSOR.equals(usuario.getTipo())) {
+            if (usuario.getStatusVerificacao() == null || 
+                com.example.learnwave.enums.StatusVerificacao.PENDENTE.equals(usuario.getStatusVerificacao())) {
+                throw new RuntimeException("Cadastro aguardando aprovação do administrador");
+            }
+            if (com.example.learnwave.enums.StatusVerificacao.REJEITADO.equals(usuario.getStatusVerificacao())) {
+                throw new RuntimeException("Cadastro reprovado pelo administrador");
+            }
         }
 
+        if ("inativo".equals(usuario.getStatus())) {
+            System.out.println("Usuario inativo");
+            throw new RuntimeException("Usuário inativo");
+        }
+
+        System.out.println("Login bem-sucedido para: " + usuario.getEmail());
         return ResponseEntity.ok(usuario);
     }
 
@@ -117,29 +156,34 @@ public class UsuarioController {
 
     @PatchMapping("/{id}/aprovar")
     public ResponseEntity<Void> aprovarProfessor(@PathVariable Integer id) {
+        System.out.println("Controller: Recebida solicitacao para aprovar professor ID: " + id);
         if (!usuarioService.aprovarProfessor(id)) {
+            System.out.println("Controller: Falha ao aprovar professor ID: " + id);
             return ResponseEntity.notFound().build();
         }
+        System.out.println("Controller: Professor aprovado com sucesso ID: " + id);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/rejeitar")
     public ResponseEntity<Void> rejeitarProfessor(@PathVariable Integer id) {
-        if (!usuarioService.rejeitarProfessor(id)) {
-            return ResponseEntity.notFound().build();
+        try {
+            System.out.println("Controller: Rejeitando professor ID: " + id);
+            if (!usuarioService.rejeitarProfessor(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            System.out.println("Controller: Professor rejeitado com sucesso ID: " + id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.out.println("Controller: Erro ao rejeitar professor: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok().build();
     }
 
     // Rotas específicas baseadas no script SQL
     @GetMapping("/area/{area}")
     public ResponseEntity<List<Usuario>> buscarPorAreaEnsino(@PathVariable String area) {
         return ResponseEntity.ok(usuarioService.buscarPorAreaEnsino(area));
-    }
-
-    @GetMapping("/disciplina/{disciplina}")
-    public ResponseEntity<List<Usuario>> buscarPorDisciplina(@PathVariable String disciplina) {
-        return ResponseEntity.ok(usuarioService.buscarPorDisciplina(disciplina));
     }
 
     @GetMapping("/escola/{escola}")
@@ -151,6 +195,17 @@ public class UsuarioController {
     public ResponseEntity<List<Usuario>> buscarPorStatusVerificacao(@PathVariable String status) {
         return ResponseEntity.ok(usuarioService.buscarPorStatusVerificacao(status));
     }
+
+    @GetMapping("/{id}/documento")
+    public ResponseEntity<String> buscarDocumentoUsuario(@PathVariable Integer id) {
+        Usuario usuario = usuarioService.buscarPorId(id);
+        if (usuario == null || usuario.getDocumentoUrl() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(usuario.getDocumentoUrl());
+    }
+
+
 
     // Validações
     private void validarDadosObrigatorios(Usuario usuario) {

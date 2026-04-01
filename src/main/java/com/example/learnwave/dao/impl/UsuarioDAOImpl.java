@@ -19,6 +19,16 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public Usuario salvar(Usuario usuario) {
+        // Forçar status baseado no tipo
+        if (TipoUsuario.ALUNO.equals(usuario.getTipo()) || 
+            TipoUsuario.ESTUDANTE.equals(usuario.getTipo()) || 
+            TipoUsuario.ADMIN.equals(usuario.getTipo()) || 
+            TipoUsuario.ADMINISTRADOR.equals(usuario.getTipo())) {
+            usuario.setStatusVerificacao(StatusVerificacao.APROVADO);
+        } else if (TipoUsuario.PROFESSOR.equals(usuario.getTipo())) {
+            usuario.setStatusVerificacao(StatusVerificacao.PENDENTE);
+        }
+        
         return usuarioRepository.save(usuario);
     }
 
@@ -71,6 +81,10 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         return new ArrayList<>();
     }
 
+    public List<Usuario> buscarProfessoresPendentes() {
+        return usuarioRepository.findByTipoAndStatusVerificacao(TipoUsuario.PROFESSOR, StatusVerificacao.PENDENTE);
+    }
+
     @Override
     public boolean existeEmail(String email) {
         return usuarioRepository.existsByEmail(email);
@@ -83,22 +97,54 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public boolean aprovarProfessor(Integer id) {
-        return true;
+        System.out.println("Aprovando professor com ID: " + id);
+        Usuario usuario = buscarPorId(id);
+        if (usuario != null) {
+            System.out.println("Usuario encontrado: " + usuario.getEmail() + ", Status atual: " + usuario.getStatusVerificacao());
+            usuario.setStatusVerificacao(StatusVerificacao.APROVADO);
+            usuario.setStatus("ativo");
+            Usuario usuarioSalvo = usuarioRepository.save(usuario);
+            System.out.println("Usuario salvo com status: " + usuarioSalvo.getStatusVerificacao() + ", ativo: " + usuarioSalvo.getStatus());
+            return true;
+        }
+        System.out.println("Usuario nao encontrado com ID: " + id);
+        return false;
     }
 
     @Override
     public boolean rejeitarProfessor(Integer id) {
-        return true;
+        System.out.println("DAO: Rejeitando professor ID: " + id);
+        Usuario usuario = buscarPorId(id);
+        if (usuario != null) {
+            usuario.setStatusVerificacao(StatusVerificacao.REJEITADO);
+            usuarioRepository.save(usuario);
+            System.out.println("DAO: Professor rejeitado ID: " + id);
+            return true;
+        }
+        System.out.println("DAO: Usuario não encontrado com ID: " + id);
+        return false;
     }
 
     @Override
     public boolean ativarUsuario(Integer id) {
-        return true;
+        Usuario usuario = buscarPorId(id);
+        if (usuario != null) {
+            usuario.setStatus("ativo");
+            usuarioRepository.save(usuario);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean desativarUsuario(Integer id) {
-        return true;
+        Usuario usuario = buscarPorId(id);
+        if (usuario != null) {
+            usuario.setStatus("inativo");
+            usuarioRepository.save(usuario);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -114,11 +160,6 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     @Override
     public List<Usuario> buscarPorAreaEnsino(String area) {
         return usuarioRepository.findByAreaEnsino(area);
-    }
-
-    @Override
-    public List<Usuario> buscarPorDisciplina(String disciplina) {
-        return usuarioRepository.findByDisciplina(disciplina);
     }
 
     @Override

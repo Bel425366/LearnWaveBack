@@ -4,7 +4,8 @@ public enum TipoUsuario {
     ALUNO("aluno"),
     ESTUDANTE("estudante"),
     PROFESSOR("professor"),
-    ADMINISTRADOR("administrador");
+    ADMINISTRADOR("administrador"),
+    ADMIN("admin");
 
     private final String valor;
 

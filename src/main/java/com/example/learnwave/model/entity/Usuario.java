@@ -31,9 +31,8 @@ public class Usuario {
     private TipoUsuario tipo;
     private String cpf;
     private String telefone;
-    private String disciplina;
     private String escola;
-    @Column(name = "documento_url")
+    @Column(name = "documento_url", columnDefinition = "TEXT")
     private String documentoUrl;
     @Enumerated(EnumType.STRING)
     @Column(name = "status_verificacao")
@@ -42,6 +41,8 @@ public class Usuario {
     private String areaEnsino;
     private String formacao;
     private String experiencia;
+    @Column(nullable = true)
+    private String bio;
     private String status;
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
@@ -69,7 +70,7 @@ public class Usuario {
         this.email = email;
         this.senha = senha;
         this.tipo = tipo;
-        this.statusVerificacao = StatusVerificacao.PENDENTE;
+        // Status será definido no service baseado no tipo
         this.status = "ativo";
         this.dataCriacao = LocalDateTime.now();
         this.dataAtualizacao = LocalDateTime.now();
@@ -103,9 +104,6 @@ public class Usuario {
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
 
-    public String getDisciplina() { return disciplina; }
-    public void setDisciplina(String disciplina) { this.disciplina = disciplina; }
-
     public String getEscola() { return escola; }
     public void setEscola(String escola) { this.escola = escola; }
 
@@ -123,6 +121,9 @@ public class Usuario {
 
     public String getExperiencia() { return experiencia; }
     public void setExperiencia(String experiencia) { this.experiencia = experiencia; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

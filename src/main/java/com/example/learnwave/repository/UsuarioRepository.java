@@ -15,8 +15,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     List<Usuario> findByTipo(TipoUsuario tipo);
     List<Usuario> findByStatus(String status);
     List<Usuario> findByStatusVerificacao(StatusVerificacao statusVerificacao);
+    List<Usuario> findByTipoAndStatusVerificacao(TipoUsuario tipo, StatusVerificacao statusVerificacao);
     List<Usuario> findByAreaEnsino(String areaEnsino);
-    List<Usuario> findByDisciplina(String disciplina);
     List<Usuario> findByEscola(String escola);
     boolean existsByEmail(String email);
     boolean existsByCpf(String cpf);

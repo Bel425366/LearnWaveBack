@@ -34,10 +34,12 @@ public interface UsuarioDAO {
     // Estatísticas
     long contarUsuariosPorTipo(TipoUsuario tipo);
     long contarProfessoresPendentes();
+    
+    // Buscar professores pendentes
+    List<Usuario> buscarProfessoresPendentes();
 
     // Consultas específicas por campos
     List<Usuario> buscarPorAreaEnsino(String area);
-    List<Usuario> buscarPorDisciplina(String disciplina);
     List<Usuario> buscarPorEscola(String escola);
     List<Usuario> buscarPorStatusVerificacao(String status);
 }
