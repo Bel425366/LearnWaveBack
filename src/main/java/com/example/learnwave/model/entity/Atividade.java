@@ -1,24 +1,37 @@
 package com.example.learnwave.model.entity;
 
-
 import com.example.learnwave.enums.StatusConteudo;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "atividades")
 public class Atividade {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(nullable = false)
     private String titulo;
     private String descricao;
+    @Column(nullable = false)
     private String area;
+    @Column(name = "professor_id", nullable = false)
     private Integer professorId;
+    @Column(columnDefinition = "NTEXT")
     private String conteudo;
+    @Enumerated(EnumType.STRING)
     private StatusConteudo status;
+    @Column(nullable = false)
+    private String situacao = "ativo"; // ativo, lixeira, excluido
+    @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
+    @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
 
-    // Relacionamentos
+    @Transient
     private Usuario professor;
+    @Transient
     private List<ProgressoAtividade> progressos;
 
     public Atividade() {}
@@ -55,6 +68,9 @@ public class Atividade {
 
     public StatusConteudo getStatus() { return status; }
     public void setStatus(StatusConteudo status) { this.status = status; }
+
+    public String getSituacao() { return situacao; }
+    public void setSituacao(String situacao) { this.situacao = situacao; }
 
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }

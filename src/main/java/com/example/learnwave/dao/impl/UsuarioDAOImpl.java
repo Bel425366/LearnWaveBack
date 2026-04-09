@@ -126,6 +126,11 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
+    public void atualizarNome(Integer id, String nome) {
+        usuarioRepository.updateNome(id, nome);
+    }
+
+    @Override
     public boolean ativarUsuario(Integer id) {
         Usuario usuario = buscarPorId(id);
         if (usuario != null) {

@@ -79,6 +79,10 @@ public class UsuarioService {
         return usuarioDAO.buscarPorStatus(status);
     }
 
+    public void atualizarNome(Integer id, String nome) {
+        usuarioDAO.atualizarNome(id, nome);
+    }
+
     public Usuario atualizar(Usuario usuario) {
         Usuario usuarioExistente = usuarioDAO.buscarPorId(usuario.getId());
         if (usuarioExistente == null) {

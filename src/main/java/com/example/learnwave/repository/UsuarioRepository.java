@@ -4,7 +4,11 @@ import com.example.learnwave.enums.StatusVerificacao;
 import com.example.learnwave.enums.TipoUsuario;
 import com.example.learnwave.model.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,4 +24,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     List<Usuario> findByEscola(String escola);
     boolean existsByEmail(String email);
     boolean existsByCpf(String cpf);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Usuario u SET u.nome = :nome WHERE u.id = :id")
+    int updateNome(@Param("id") Integer id, @Param("nome") String nome);
 }

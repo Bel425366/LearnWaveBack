@@ -30,6 +30,7 @@ public interface UsuarioDAO {
     boolean rejeitarProfessor(Integer id);
     boolean ativarUsuario(Integer id);
     boolean desativarUsuario(Integer id);
+    void atualizarNome(Integer id, String nome);
 
     // Estatísticas
     long contarUsuariosPorTipo(TipoUsuario tipo);

@@ -88,6 +88,13 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioAtualizado);
     }
 
+    @PatchMapping("/{id}/nome")
+    public ResponseEntity<Void> atualizarNome(@PathVariable Integer id, @RequestParam String nome) {
+        if (usuarioService.buscarPorId(id) == null) return ResponseEntity.notFound().build();
+        usuarioService.atualizarNome(id, nome);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> alterarStatus(@PathVariable Integer id, @RequestParam String status) {
         System.out.println("Controller: Alterando status do usuário ID: " + id + " para: " + status);

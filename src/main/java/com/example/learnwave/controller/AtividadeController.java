@@ -61,6 +61,24 @@ public class AtividadeController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{id}/lixeira")
+    public ResponseEntity<Void> moverParaLixeira(@PathVariable Integer id) {
+        Atividade a = atividadeService.buscarPorId(id);
+        if (a == null) return ResponseEntity.notFound().build();
+        a.setSituacao("lixeira");
+        atividadeService.atualizar(a);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/restaurar")
+    public ResponseEntity<Void> restaurar(@PathVariable Integer id) {
+        Atividade a = atividadeService.buscarPorId(id);
+        if (a == null) return ResponseEntity.notFound().build();
+        a.setSituacao("ativo");
+        atividadeService.atualizar(a);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/{id}/publicar")
     public ResponseEntity<Void> publicarAtividade(@PathVariable Integer id) {
         if (!atividadeService.publicar(id)) {
