@@ -83,6 +83,13 @@ public class UsuarioService {
         usuarioDAO.atualizarNome(id, nome);
     }
 
+    public void alterarSenha(Integer id, String senhaAtual, String novaSenha) {
+        Usuario usuario = usuarioDAO.buscarPorId(id);
+        if (usuario == null) throw new RuntimeException("Usuário não encontrado");
+        if (!verificarSenha(senhaAtual, usuario.getSenha())) throw new RuntimeException("Senha atual incorreta");
+        usuarioDAO.atualizarSenha(id, novaSenha);
+    }
+
     public Usuario atualizar(Usuario usuario) {
         Usuario usuarioExistente = usuarioDAO.buscarPorId(usuario.getId());
         if (usuarioExistente == null) {

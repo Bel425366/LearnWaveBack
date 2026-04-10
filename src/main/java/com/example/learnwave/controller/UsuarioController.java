@@ -95,6 +95,16 @@ public class UsuarioController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{id}/senha")
+    public ResponseEntity<?> alterarSenha(@PathVariable Integer id, @RequestParam String senhaAtual, @RequestParam String novaSenha) {
+        try {
+            usuarioService.alterarSenha(id, senhaAtual, novaSenha);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> alterarStatus(@PathVariable Integer id, @RequestParam String status) {
         System.out.println("Controller: Alterando status do usuário ID: " + id + " para: " + status);

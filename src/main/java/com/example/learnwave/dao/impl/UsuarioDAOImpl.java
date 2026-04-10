@@ -131,6 +131,15 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
+    public void atualizarSenha(Integer id, String novaSenha) {
+        Usuario usuario = buscarPorId(id);
+        if (usuario != null) {
+            usuario.setSenha(novaSenha);
+            usuarioRepository.save(usuario);
+        }
+    }
+
+    @Override
     public boolean ativarUsuario(Integer id) {
         Usuario usuario = buscarPorId(id);
         if (usuario != null) {

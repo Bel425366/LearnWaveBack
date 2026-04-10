@@ -31,6 +31,7 @@ public interface UsuarioDAO {
     boolean ativarUsuario(Integer id);
     boolean desativarUsuario(Integer id);
     void atualizarNome(Integer id, String nome);
+    void atualizarSenha(Integer id, String novaSenha);
 
     // Estatísticas
     long contarUsuariosPorTipo(TipoUsuario tipo);
