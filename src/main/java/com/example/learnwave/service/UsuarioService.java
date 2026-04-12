@@ -75,6 +75,12 @@ public class UsuarioService {
         return usuarioDAO.buscarPorTipo(tipo);
     }
 
+    public List<Usuario> buscarPorTipoEVerificacao(TipoUsuario tipo, com.example.learnwave.enums.StatusVerificacao statusVerificacao) {
+        return usuarioDAO.buscarPorStatusVerificacao(statusVerificacao).stream()
+                .filter(u -> tipo.equals(u.getTipo()))
+                .toList();
+    }
+
     public List<Usuario> buscarPorStatus(String status) {
         return usuarioDAO.buscarPorStatus(status);
     }

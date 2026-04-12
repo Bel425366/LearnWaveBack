@@ -171,6 +171,11 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarProfessoresPendentes());
     }
 
+    @GetMapping("/professores/aprovados")
+    public ResponseEntity<List<Usuario>> listarProfessoresAprovados() {
+        return ResponseEntity.ok(usuarioService.buscarPorTipoEVerificacao(TipoUsuario.PROFESSOR, com.example.learnwave.enums.StatusVerificacao.APROVADO));
+    }
+
     @PatchMapping("/{id}/aprovar")
     public ResponseEntity<Void> aprovarProfessor(@PathVariable Integer id) {
         System.out.println("Controller: Recebida solicitacao para aprovar professor ID: " + id);
