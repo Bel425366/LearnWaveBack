@@ -3,7 +3,8 @@ package com.example.learnwave.enums;
 public enum StatusConteudo {
     RASCUNHO("rascunho"),
     PUBLICADO("publicado"),
-    ARQUIVADO("arquivado");
+    ARQUIVADO("arquivado"),
+    LIXEIRA("lixeira");
 
     private final String valor;
 

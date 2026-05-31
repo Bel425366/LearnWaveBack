@@ -32,6 +32,16 @@ public class ProgressoVideoaulaController {
         return ResponseEntity.ok(progressoVideoaulaService.listarPorVideoaula(videoaulaId));
     }
 
+    @GetMapping("/aluno/{alunoId}/videoaula/{videoaulaId}")
+    public ResponseEntity<ProgressoVideoaula> buscarPorAlunoEVideoaula(
+            @PathVariable Integer alunoId, @PathVariable Integer videoaulaId) {
+        ProgressoVideoaula progresso = progressoVideoaulaService.buscarPorAlunoEVideoaula(alunoId, videoaulaId);
+        if (progresso == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(progresso);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProgressoVideoaula> atualizarProgresso(@PathVariable Integer id, @RequestBody ProgressoVideoaula progresso) {
         progresso.setId(id);

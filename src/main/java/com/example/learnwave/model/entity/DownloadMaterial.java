@@ -1,15 +1,25 @@
 package com.example.learnwave.model.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "downloads_materiais")
 public class DownloadMaterial {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "aluno_id", nullable = false)
     private Integer alunoId;
+    @Column(name = "material_id", nullable = false)
     private Integer materialId;
+    @Column(name = "data_download")
     private LocalDateTime dataDownload;
 
     // Relacionamentos
+    @Transient
     private Usuario aluno;
+    @Transient
     private Material material;
 
     public DownloadMaterial() {}

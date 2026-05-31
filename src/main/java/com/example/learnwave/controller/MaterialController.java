@@ -77,7 +77,6 @@ public class MaterialController {
         return ResponseEntity.ok().build();
     }
 
-    // Rotas específicas baseadas no script SQL
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Material>> buscarPorStatus(@PathVariable String status) {
         return ResponseEntity.ok(materialService.buscarPorStatus(status));
@@ -104,5 +103,32 @@ public class MaterialController {
     @GetMapping("/{id}/downloads/count")
     public ResponseEntity<Long> contarDownloads(@PathVariable Integer id) {
         return ResponseEntity.ok(materialService.contarDownloads(id));
+    }
+
+    /**
+     * Move material para a lixeira (soft delete).
+     */
+    @PatchMapping("/{id}/lixeira")
+    public ResponseEntity<Void> moverParaLixeira(@PathVariable Integer id) {
+        if (!materialService.deletar(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Restaura material da lixeira, voltando para RASCUNHO.
+     */
+    @PatchMapping("/{id}/restaurar")
+    public ResponseEntity<Void> restaurar(@PathVariable Integer id) {
+        if (!materialService.voltarParaRascunho(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/lixeira/professor/{professorId}")
+    public ResponseEntity<List<Material>> listarLixeiraPorProfessor(@PathVariable Integer professorId) {
+        return ResponseEntity.ok(materialService.listarNaLixeiraPorProfessor(professorId));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.learnwave.service;
 
 import com.example.learnwave.dao.MaterialDAO;
+import com.example.learnwave.dao.impl.MaterialDAOImpl;
 import com.example.learnwave.enums.StatusConteudo;
 import com.example.learnwave.model.entity.Material;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,5 +69,12 @@ public class MaterialService {
 
     public Long contarDownloads(Integer id) {
         return materialDAO.contarDownloads(id);
+    }
+
+    public List<Material> listarNaLixeiraPorProfessor(Integer professorId) {
+        if (materialDAO instanceof MaterialDAOImpl) {
+            return ((MaterialDAOImpl) materialDAO).buscarNaLixeiraPorProfessor(professorId);
+        }
+        return List.of();
     }
 }

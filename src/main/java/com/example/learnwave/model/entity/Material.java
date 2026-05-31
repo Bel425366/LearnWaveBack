@@ -1,6 +1,7 @@
 package com.example.learnwave.model.entity;
 
 import com.example.learnwave.enums.StatusConteudo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,8 +27,10 @@ public class Material {
     private Integer tamanhoArquivo;
     @Enumerated(EnumType.STRING)
     private StatusConteudo status;
-    @Column(name = "situacao", nullable = false)
-    private String situacao = "ativo";
+    // Coluna mantida no banco para compatibilidade, mas ignorada na lógica
+    @JsonIgnore
+    @Column(name = "situacao")
+    private String situacao;
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
     @Column(name = "data_atualizacao")
@@ -48,7 +51,6 @@ public class Material {
         this.arquivoUrl = arquivoUrl;
         this.tipoArquivo = tipoArquivo;
         this.status = StatusConteudo.RASCUNHO;
-        this.situacao = "ativo";
         this.dataCriacao = LocalDateTime.now();
         this.dataAtualizacao = LocalDateTime.now();
     }
@@ -81,6 +83,9 @@ public class Material {
     public StatusConteudo getStatus() { return status; }
     public void setStatus(StatusConteudo status) { this.status = status; }
 
+    public String getSituacao() { return situacao; }
+    public void setSituacao(String situacao) { this.situacao = situacao; }
+
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
 
@@ -89,9 +94,6 @@ public class Material {
 
     public Usuario getProfessor() { return professor; }
     public void setProfessor(Usuario professor) { this.professor = professor; }
-
-    public String getSituacao() { return situacao; }
-    public void setSituacao(String situacao) { this.situacao = situacao; }
 
     public List<DownloadMaterial> getDownloads() { return downloads; }
     public void setDownloads(List<DownloadMaterial> downloads) { this.downloads = downloads; }

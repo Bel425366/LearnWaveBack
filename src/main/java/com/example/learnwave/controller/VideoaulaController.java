@@ -77,7 +77,28 @@ public class VideoaulaController {
         return ResponseEntity.ok().build();
     }
 
-    // Rotas específicas baseadas no script SQL
+    @PatchMapping("/{id}/lixeira")
+    public ResponseEntity<Void> moverParaLixeira(@PathVariable Integer id) {
+        if (!videoaulaService.moverParaLixeira(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/restaurar")
+    public ResponseEntity<Void> restaurar(@PathVariable Integer id) {
+        if (!videoaulaService.restaurar(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/lixeira/professor/{professorId}")
+    public ResponseEntity<List<Videoaula>> listarLixeiraPorProfessor(@PathVariable Integer professorId) {
+        return ResponseEntity.ok(videoaulaService.listarNaLixeiraPorProfessor(professorId));
+    }
+
+    // Rotas específicas
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Videoaula>> buscarPorStatus(@PathVariable String status) {
         return ResponseEntity.ok(videoaulaService.buscarPorStatus(status));

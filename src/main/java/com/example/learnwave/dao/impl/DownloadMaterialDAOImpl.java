@@ -2,31 +2,39 @@ package com.example.learnwave.dao.impl;
 
 import com.example.learnwave.dao.DownloadMaterialDAO;
 import com.example.learnwave.model.entity.DownloadMaterial;
+import com.example.learnwave.repository.DownloadMaterialRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public class DownloadMaterialDAOImpl implements DownloadMaterialDAO {
 
+    @Autowired
+    private DownloadMaterialRepository downloadMaterialRepository;
+
     @Override
     public DownloadMaterial salvar(DownloadMaterial download) {
-        return download;
+        if (download.getDataDownload() == null) {
+            download.setDataDownload(LocalDateTime.now());
+        }
+        return downloadMaterialRepository.save(download);
     }
 
     @Override
     public List<DownloadMaterial> listarPorAluno(Integer alunoId) {
-        return new ArrayList<>();
+        return downloadMaterialRepository.findByAlunoId(alunoId);
     }
 
     @Override
     public List<DownloadMaterial> listarPorMaterial(Integer materialId) {
-        return new ArrayList<>();
+        return downloadMaterialRepository.findByMaterialId(materialId);
     }
 
     @Override
     public Long contarDownloads(Integer materialId) {
-        return 0L;
+        return downloadMaterialRepository.countByMaterialId(materialId);
     }
 }

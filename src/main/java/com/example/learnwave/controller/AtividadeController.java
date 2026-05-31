@@ -1,7 +1,9 @@
 package com.example.learnwave.controller;
 
+import com.example.learnwave.enums.StatusConteudo;
 import com.example.learnwave.model.entity.Atividade;
 import com.example.learnwave.service.AtividadeService;
+import com.example.learnwave.service.NotaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,9 @@ public class AtividadeController {
 
     @Autowired
     private AtividadeService atividadeService;
+
+    @Autowired
+    private NotaService notaService;
 
     @PostMapping
     public ResponseEntity<Atividade> criarAtividade(@RequestBody Atividade atividade) {
@@ -61,21 +66,27 @@ public class AtividadeController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Move atividade para a lixeira (soft delete).
+     * A atividade deixa de aparecer para alunos.
+     * As notas são desconsideradas da média (mas não apagadas).
+     */
     @PatchMapping("/{id}/lixeira")
     public ResponseEntity<Void> moverParaLixeira(@PathVariable Integer id) {
-        Atividade a = atividadeService.buscarPorId(id);
-        if (a == null) return ResponseEntity.notFound().build();
-        a.setSituacao("lixeira");
-        atividadeService.atualizar(a);
+        if (!atividadeService.deletar(id)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Restaura atividade da lixeira, voltando para RASCUNHO.
+     */
     @PatchMapping("/{id}/restaurar")
     public ResponseEntity<Void> restaurar(@PathVariable Integer id) {
-        Atividade a = atividadeService.buscarPorId(id);
-        if (a == null) return ResponseEntity.notFound().build();
-        a.setSituacao("ativo");
-        atividadeService.atualizar(a);
+        if (!atividadeService.voltarParaRascunho(id)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -95,7 +106,6 @@ public class AtividadeController {
         return ResponseEntity.ok().build();
     }
 
-    // Rotas específicas baseadas no script SQL
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Atividade>> buscarPorStatus(@PathVariable String status) {
         return ResponseEntity.ok(atividadeService.buscarPorStatus(status));
@@ -112,5 +122,10 @@ public class AtividadeController {
     @GetMapping("/publicadas")
     public ResponseEntity<List<Atividade>> listarPublicadas() {
         return ResponseEntity.ok(atividadeService.listarPublicadas());
+    }
+
+    @GetMapping("/lixeira/professor/{professorId}")
+    public ResponseEntity<List<Atividade>> listarLixeiraPorProfessor(@PathVariable Integer professorId) {
+        return ResponseEntity.ok(atividadeService.listarNaLixeiraPorProfessor(professorId));
     }
 }

@@ -19,7 +19,6 @@ public class AtividadeDAOImpl implements AtividadeDAO {
     @Override
     public Atividade salvar(Atividade atividade) {
         if (atividade.getStatus() == null) atividade.setStatus(StatusConteudo.RASCUNHO);
-        if (atividade.getSituacao() == null) atividade.setSituacao("ativo");
         atividade.setDataCriacao(LocalDateTime.now());
         atividade.setDataAtualizacao(LocalDateTime.now());
         return atividadeRepository.save(atividade);
@@ -32,11 +31,16 @@ public class AtividadeDAOImpl implements AtividadeDAO {
 
     @Override
     public List<Atividade> listarTodas() {
-        return atividadeRepository.findBySituacaoNot("excluido");
+        return atividadeRepository.findByStatusNot(StatusConteudo.LIXEIRA);
     }
 
     @Override
     public Atividade atualizar(Atividade atividade) {
+        Atividade existente = buscarPorId(atividade.getId());
+        if (existente != null) {
+            if (atividade.getDataCriacao() == null) atividade.setDataCriacao(existente.getDataCriacao());
+            if (atividade.getStatus() == null) atividade.setStatus(existente.getStatus());
+        }
         atividade.setDataAtualizacao(LocalDateTime.now());
         return atividadeRepository.save(atividade);
     }
@@ -45,12 +49,8 @@ public class AtividadeDAOImpl implements AtividadeDAO {
     public boolean deletar(Integer id) {
         Atividade a = buscarPorId(id);
         if (a == null) return false;
-        // Se já está na lixeira, marca como excluido definitivamente
-        if ("lixeira".equals(a.getSituacao())) {
-            a.setSituacao("excluido");
-        } else {
-            a.setSituacao("lixeira");
-        }
+        // Soft delete: mover para lixeira
+        a.setStatus(StatusConteudo.LIXEIRA);
         a.setDataAtualizacao(LocalDateTime.now());
         atividadeRepository.save(a);
         return true;
@@ -58,26 +58,26 @@ public class AtividadeDAOImpl implements AtividadeDAO {
 
     @Override
     public List<Atividade> buscarPorProfessor(Integer professorId) {
-        return atividadeRepository.findByProfessorIdAndSituacaoNot(professorId, "excluido");
+        return atividadeRepository.findByProfessorIdAndStatusNot(professorId, StatusConteudo.LIXEIRA);
     }
 
     public List<Atividade> buscarNaLixeiraPorProfessor(Integer professorId) {
-        return atividadeRepository.findByProfessorIdAndSituacao(professorId, "lixeira");
+        return atividadeRepository.findByProfessorIdAndStatus(professorId, StatusConteudo.LIXEIRA);
     }
 
     @Override
     public List<Atividade> buscarPorArea(String area) {
-        return atividadeRepository.findByAreaAndStatusAndSituacao(area, StatusConteudo.PUBLICADO, "ativo");
+        return atividadeRepository.findByAreaAndStatus(area, StatusConteudo.PUBLICADO);
     }
 
     @Override
     public List<Atividade> buscarPorStatus(StatusConteudo status) {
-        return atividadeRepository.findByStatusAndSituacao(status, "ativo");
+        return atividadeRepository.findByStatus(status);
     }
 
     @Override
     public List<Atividade> buscarPorAreaEStatus(String area, StatusConteudo status) {
-        return atividadeRepository.findByAreaAndStatusAndSituacao(area, status, "ativo");
+        return atividadeRepository.findByAreaAndStatus(area, status);
     }
 
     @Override
@@ -85,7 +85,6 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         Atividade a = buscarPorId(id);
         if (a == null) return false;
         a.setStatus(StatusConteudo.PUBLICADO);
-        a.setSituacao("ativo");
         a.setDataAtualizacao(LocalDateTime.now());
         atividadeRepository.save(a);
         return true;
@@ -106,7 +105,6 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         Atividade a = buscarPorId(id);
         if (a == null) return false;
         a.setStatus(StatusConteudo.RASCUNHO);
-        a.setSituacao("ativo");
         a.setDataAtualizacao(LocalDateTime.now());
         atividadeRepository.save(a);
         return true;
@@ -114,21 +112,21 @@ public class AtividadeDAOImpl implements AtividadeDAO {
 
     @Override
     public List<Atividade> buscarPublicadas() {
-        return atividadeRepository.findByStatusAndSituacao(StatusConteudo.PUBLICADO, "ativo");
+        return atividadeRepository.findByStatus(StatusConteudo.PUBLICADO);
     }
 
     @Override
     public long contarPorStatus(StatusConteudo status) {
-        return atividadeRepository.findByStatusAndSituacao(status, "ativo").size();
+        return atividadeRepository.findByStatus(status).size();
     }
 
     @Override
     public long contarPorArea(String area) {
-        return atividadeRepository.findByAreaAndStatusAndSituacao(area, StatusConteudo.PUBLICADO, "ativo").size();
+        return atividadeRepository.findByAreaAndStatus(area, StatusConteudo.PUBLICADO).size();
     }
 
     @Override
     public long contarPorProfessor(Integer professorId) {
-        return atividadeRepository.findByProfessorIdAndSituacaoNot(professorId, "excluido").size();
+        return atividadeRepository.findByProfessorIdAndStatusNot(professorId, StatusConteudo.LIXEIRA).size();
     }
 }

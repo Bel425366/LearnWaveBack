@@ -1,22 +1,34 @@
 package com.example.learnwave.model.entity;
 
-
 import com.example.learnwave.enums.StatusProgresso;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "progresso_videoaulas")
 public class ProgressoVideoaula {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "aluno_id", nullable = false)
     private Integer alunoId;
+    @Column(name = "videoaula_id", nullable = false)
     private Integer videoaulaId;
+    @Enumerated(EnumType.STRING)
     private StatusProgresso status;
+    @Column(name = "tempo_assistido")
     private Integer tempoAssistido; // em segundos
+    @Column(name = "data_inicio")
     private LocalDateTime dataInicio;
+    @Column(name = "data_conclusao")
     private LocalDateTime dataConclusao;
+    @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
 
     // Relacionamentos
+    @Transient
     private Usuario aluno;
+    @Transient
     private Videoaula videoaula;
 
     public ProgressoVideoaula() {}
@@ -26,6 +38,7 @@ public class ProgressoVideoaula {
         this.videoaulaId = videoaulaId;
         this.status = StatusProgresso.NAO_INICIADO;
         this.tempoAssistido = 0;
+        this.dataInicio = LocalDateTime.now();
         this.dataAtualizacao = LocalDateTime.now();
     }
 

@@ -9,9 +9,10 @@ import java.util.List;
 
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, Integer> {
-    List<Material> findByProfessorIdAndSituacaoNot(Integer professorId, String situacao);
-    List<Material> findByStatusAndSituacao(StatusConteudo status, String situacao);
-    List<Material> findByAreaAndStatusAndSituacao(String area, StatusConteudo status, String situacao);
-    List<Material> findBySituacaoNot(String situacao);
+    List<Material> findByProfessorIdAndStatusNot(Integer professorId, StatusConteudo status);
+    List<Material> findByProfessorIdAndStatus(Integer professorId, StatusConteudo status);
+    List<Material> findByStatus(StatusConteudo status);
+    List<Material> findByAreaAndStatus(String area, StatusConteudo status);
+    List<Material> findByStatusNot(StatusConteudo status);
     List<Material> findByTipoArquivo(String tipoArquivo);
 }

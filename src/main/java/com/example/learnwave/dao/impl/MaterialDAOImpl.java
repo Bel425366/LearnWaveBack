@@ -3,6 +3,7 @@ package com.example.learnwave.dao.impl;
 import com.example.learnwave.dao.MaterialDAO;
 import com.example.learnwave.enums.StatusConteudo;
 import com.example.learnwave.model.entity.Material;
+import com.example.learnwave.repository.DownloadMaterialRepository;
 import com.example.learnwave.repository.MaterialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,10 +17,12 @@ public class MaterialDAOImpl implements MaterialDAO {
     @Autowired
     private MaterialRepository materialRepository;
 
+    @Autowired
+    private DownloadMaterialRepository downloadMaterialRepository;
+
     @Override
     public Material salvar(Material material) {
         if (material.getStatus() == null) material.setStatus(StatusConteudo.RASCUNHO);
-        if (material.getSituacao() == null) material.setSituacao("ativo");
         material.setDataCriacao(LocalDateTime.now());
         material.setDataAtualizacao(LocalDateTime.now());
         return materialRepository.save(material);
@@ -32,15 +35,15 @@ public class MaterialDAOImpl implements MaterialDAO {
 
     @Override
     public List<Material> listarTodos() {
-        return materialRepository.findBySituacaoNot("excluido");
+        return materialRepository.findByStatusNot(StatusConteudo.LIXEIRA);
     }
 
     @Override
     public Material atualizar(Material material) {
         Material existente = buscarPorId(material.getId());
         if (existente != null) {
-            if (material.getSituacao() == null) material.setSituacao(existente.getSituacao());
             if (material.getDataCriacao() == null) material.setDataCriacao(existente.getDataCriacao());
+            if (material.getStatus() == null) material.setStatus(existente.getStatus());
         }
         material.setDataAtualizacao(LocalDateTime.now());
         return materialRepository.save(material);
@@ -50,11 +53,8 @@ public class MaterialDAOImpl implements MaterialDAO {
     public boolean deletar(Integer id) {
         Material m = buscarPorId(id);
         if (m == null) return false;
-        if ("lixeira".equals(m.getSituacao())) {
-            m.setSituacao("excluido");
-        } else {
-            m.setSituacao("lixeira");
-        }
+        // Soft delete: mover para lixeira
+        m.setStatus(StatusConteudo.LIXEIRA);
         m.setDataAtualizacao(LocalDateTime.now());
         materialRepository.save(m);
         return true;
@@ -62,12 +62,12 @@ public class MaterialDAOImpl implements MaterialDAO {
 
     @Override
     public List<Material> buscarPorProfessor(Integer professorId) {
-        return materialRepository.findByProfessorIdAndSituacaoNot(professorId, "excluido");
+        return materialRepository.findByProfessorIdAndStatusNot(professorId, StatusConteudo.LIXEIRA);
     }
 
     @Override
     public List<Material> buscarPorAreaEStatus(String area, StatusConteudo status) {
-        return materialRepository.findByAreaAndStatusAndSituacao(area, status, "ativo");
+        return materialRepository.findByAreaAndStatus(area, status);
     }
 
     @Override
@@ -75,7 +75,6 @@ public class MaterialDAOImpl implements MaterialDAO {
         Material m = buscarPorId(id);
         if (m == null) return false;
         m.setStatus(StatusConteudo.PUBLICADO);
-        m.setSituacao("ativo");
         m.setDataAtualizacao(LocalDateTime.now());
         materialRepository.save(m);
         return true;
@@ -96,7 +95,6 @@ public class MaterialDAOImpl implements MaterialDAO {
         Material m = buscarPorId(id);
         if (m == null) return false;
         m.setStatus(StatusConteudo.RASCUNHO);
-        m.setSituacao("ativo");
         m.setDataAtualizacao(LocalDateTime.now());
         materialRepository.save(m);
         return true;
@@ -104,17 +102,17 @@ public class MaterialDAOImpl implements MaterialDAO {
 
     @Override
     public List<Material> buscarPublicados() {
-        return materialRepository.findByStatusAndSituacao(StatusConteudo.PUBLICADO, "ativo");
+        return materialRepository.findByStatus(StatusConteudo.PUBLICADO);
     }
 
     @Override
     public List<Material> buscarPorArea(String area) {
-        return materialRepository.findByAreaAndStatusAndSituacao(area, StatusConteudo.PUBLICADO, "ativo");
+        return materialRepository.findByAreaAndStatus(area, StatusConteudo.PUBLICADO);
     }
 
     @Override
     public List<Material> buscarPorStatus(StatusConteudo status) {
-        return materialRepository.findByStatusAndSituacao(status, "ativo");
+        return materialRepository.findByStatus(status);
     }
 
     @Override
@@ -124,21 +122,25 @@ public class MaterialDAOImpl implements MaterialDAO {
 
     @Override
     public long contarDownloads(Integer materialId) {
-        return 0;
+        return downloadMaterialRepository.countByMaterialId(materialId);
     }
 
     @Override
     public long contarPorStatus(StatusConteudo status) {
-        return materialRepository.findByStatusAndSituacao(status, "ativo").size();
+        return materialRepository.findByStatus(status).size();
     }
 
     @Override
     public long contarPorArea(String area) {
-        return materialRepository.findByAreaAndStatusAndSituacao(area, StatusConteudo.PUBLICADO, "ativo").size();
+        return materialRepository.findByAreaAndStatus(area, StatusConteudo.PUBLICADO).size();
     }
 
     @Override
     public long contarPorProfessor(Integer professorId) {
-        return materialRepository.findByProfessorIdAndSituacaoNot(professorId, "excluido").size();
+        return materialRepository.findByProfessorIdAndStatusNot(professorId, StatusConteudo.LIXEIRA).size();
+    }
+
+    public List<Material> buscarNaLixeiraPorProfessor(Integer professorId) {
+        return materialRepository.findByProfessorIdAndStatus(professorId, StatusConteudo.LIXEIRA);
     }
 }

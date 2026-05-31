@@ -1,6 +1,7 @@
 package com.example.learnwave.model.entity;
 
 import com.example.learnwave.enums.StatusConteudo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,8 +23,10 @@ public class Atividade {
     private String conteudo;
     @Enumerated(EnumType.STRING)
     private StatusConteudo status;
-    @Column(nullable = false)
-    private String situacao = "ativo"; // ativo, lixeira, excluido
+    // Coluna mantida no banco para compatibilidade, mas ignorada na lógica
+    @JsonIgnore
+    @Column(name = "situacao")
+    private String situacao;
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
     @Column(name = "data_atualizacao")

@@ -1,6 +1,7 @@
 package com.example.learnwave.service;
 
 import com.example.learnwave.dao.AtividadeDAO;
+import com.example.learnwave.dao.impl.AtividadeDAOImpl;
 import com.example.learnwave.enums.StatusConteudo;
 import com.example.learnwave.model.entity.Atividade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +62,12 @@ public class AtividadeService {
 
     public List<Atividade> listarPublicadas() {
         return atividadeDAO.buscarPublicadas();
+    }
+
+    public List<Atividade> listarNaLixeiraPorProfessor(Integer professorId) {
+        if (atividadeDAO instanceof AtividadeDAOImpl) {
+            return ((AtividadeDAOImpl) atividadeDAO).buscarNaLixeiraPorProfessor(professorId);
+        }
+        return List.of();
     }
 }

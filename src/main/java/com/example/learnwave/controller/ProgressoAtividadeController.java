@@ -32,6 +32,16 @@ public class ProgressoAtividadeController {
         return ResponseEntity.ok(progressoAtividadeService.listarPorAtividade(atividadeId));
     }
 
+    @GetMapping("/aluno/{alunoId}/atividade/{atividadeId}")
+    public ResponseEntity<ProgressoAtividade> buscarPorAlunoEAtividade(
+            @PathVariable Integer alunoId, @PathVariable Integer atividadeId) {
+        ProgressoAtividade progresso = progressoAtividadeService.buscarPorAlunoEAtividade(alunoId, atividadeId);
+        if (progresso == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(progresso);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProgressoAtividade> atualizarProgresso(@PathVariable Integer id, @RequestBody ProgressoAtividade progresso) {
         progresso.setId(id);
