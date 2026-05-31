@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notas")
-@CrossOrigin(origins = "*")
 public class NotaController {
 
     @Autowired

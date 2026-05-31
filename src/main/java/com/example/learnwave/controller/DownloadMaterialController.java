@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/downloads")
-@CrossOrigin(origins = "*")
 public class DownloadMaterialController {
 
     @Autowired

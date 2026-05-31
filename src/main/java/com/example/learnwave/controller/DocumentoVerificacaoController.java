@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/documentos-verificacao")
-@CrossOrigin(origins = "*")
 public class DocumentoVerificacaoController {
 
     @Autowired

@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/progresso-atividades")
-@CrossOrigin(origins = "*")
 public class ProgressoAtividadeController {
 
     @Autowired
