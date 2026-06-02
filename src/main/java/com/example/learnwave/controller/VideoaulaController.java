@@ -120,4 +120,13 @@ public class VideoaulaController {
     public ResponseEntity<List<Videoaula>> buscarPorDuracao(@PathVariable String duracao) {
         return ResponseEntity.ok(videoaulaService.buscarPorDuracao(duracao));
     }
+
+    /**
+     * Retorna lista de IDs de professores que possuem videoaulas publicadas.
+     * O frontend pode usar isso para filtrar quais professores exibir.
+     */
+    @GetMapping("/professores-com-videoaulas")
+    public ResponseEntity<List<Integer>> listarProfessoresComVideoaulas() {
+        return ResponseEntity.ok(videoaulaService.listarProfessoresComVideoaulasPublicadas());
+    }
 }

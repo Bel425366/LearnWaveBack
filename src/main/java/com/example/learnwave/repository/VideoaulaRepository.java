@@ -3,6 +3,7 @@ package com.example.learnwave.repository;
 import com.example.learnwave.enums.StatusConteudo;
 import com.example.learnwave.model.entity.Videoaula;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,4 +22,8 @@ public interface VideoaulaRepository extends JpaRepository<Videoaula, Integer> {
     List<Videoaula> findByStatusNot(StatusConteudo status);
     // Buscar por duração
     List<Videoaula> findByDuracao(String duracao);
+
+    // Listar IDs de professores que têm videoaulas publicadas
+    @Query("SELECT DISTINCT v.professorId FROM Videoaula v WHERE v.status = com.example.learnwave.enums.StatusConteudo.PUBLICADO")
+    List<Integer> findDistinctProfessorIdByStatusPublicado();
 }
