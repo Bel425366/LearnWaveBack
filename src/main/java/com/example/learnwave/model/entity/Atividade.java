@@ -26,7 +26,7 @@ public class Atividade {
     // Coluna mantida no banco para compatibilidade, mas ignorada na lógica
     @JsonIgnore
     @Column(name = "situacao")
-    private String situacao;
+    private String situacao = "ativo";
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
     @Column(name = "data_atualizacao")
