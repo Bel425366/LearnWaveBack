@@ -43,6 +43,8 @@ public class Usuario {
     private String experiencia;
     @Column(nullable = true)
     private String bio;
+    @Column(name = "fotoperfil")
+    private String fotoPerfil;
     private String status;
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
@@ -124,6 +126,9 @@ public class Usuario {
 
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
+
+    public String getFotoPerfil() { return fotoPerfil; }
+    public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
