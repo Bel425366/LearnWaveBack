@@ -97,4 +97,11 @@ public class VideoaulaService {
     public List<Videoaula> buscarPorDuracao(String duracao) {
         return videoaulaDAO.buscarPorDuracao(duracao);
     }
+
+    public List<Integer> listarProfessoresComVideoaulasPublicadas() {
+        return videoaulaDAO.buscarPublicadas().stream()
+                .map(Videoaula::getProfessorId)
+                .distinct()
+                .toList();
+    }
 }
