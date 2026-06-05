@@ -115,6 +115,57 @@ public class UsuarioController {
         return ResponseEntity.ok().build();
     }
 
+    // PERFIL - Atualizar bio e foto de perfil
+    @PatchMapping("/{id}/perfil")
+    public ResponseEntity<?> atualizarPerfil(@PathVariable Integer id, @RequestBody java.util.Map<String, String> body) {
+        try {
+            Usuario usuario = usuarioService.buscarPorId(id);
+            if (usuario == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String bio = body.get("bio");
+            String fotoPerfil = body.get("fotoPerfil");
+
+            if (bio != null) {
+                if (bio.length() > 500) {
+                    return ResponseEntity.badRequest().body("Bio deve ter no máximo 500 caracteres");
+                }
+                usuario.setBio(bio);
+            }
+
+            if (fotoPerfil != null) {
+                // Validar tamanho (~700KB em base64 para ~500KB de imagem)
+                if (fotoPerfil.length() > 700000) {
+                    return ResponseEntity.badRequest().body("Foto de perfil muito grande. Máximo ~500KB");
+                }
+                usuario.setFotoPerfil(fotoPerfil);
+            }
+
+            Usuario atualizado = usuarioService.atualizarPerfil(id, bio, fotoPerfil);
+            return ResponseEntity.ok(atualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao atualizar perfil: " + e.getMessage());
+        }
+    }
+
+    // PERFIL - Recuperar bio e foto de perfil
+    @GetMapping("/{id}/perfil")
+    public ResponseEntity<?> buscarPerfil(@PathVariable Integer id) {
+        Usuario usuario = usuarioService.buscarPorId(id);
+        if (usuario == null) {
+            return ResponseEntity.notFound().build();
+        }
+        java.util.Map<String, Object> perfil = new java.util.HashMap<>();
+        perfil.put("id", usuario.getId());
+        perfil.put("nome", usuario.getNome());
+        perfil.put("email", usuario.getEmail());
+        perfil.put("bio", usuario.getBio());
+        perfil.put("fotoPerfil", usuario.getFotoPerfil());
+        perfil.put("tipo", usuario.getTipo());
+        return ResponseEntity.ok(perfil);
+    }
+
     // LOGAR usuário
     @PostMapping("/login")
     public ResponseEntity<Usuario> login(@RequestParam String email, @RequestParam String senha, @RequestParam(required = false) String tipoUsuario) {

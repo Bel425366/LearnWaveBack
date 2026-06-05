@@ -175,4 +175,19 @@ public class UsuarioService {
     public List<Usuario> buscarPorStatusVerificacao(String status) {
         return usuarioDAO.buscarPorStatusVerificacao(status);
     }
+
+    public Usuario atualizarPerfil(Integer id, String bio, String fotoPerfil) {
+        Usuario usuario = usuarioDAO.buscarPorId(id);
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+        if (bio != null) {
+            usuario.setBio(bio);
+        }
+        if (fotoPerfil != null) {
+            usuario.setFotoPerfil(fotoPerfil);
+        }
+        usuario.setDataAtualizacao(LocalDateTime.now());
+        return usuarioDAO.atualizar(usuario);
+    }
 }

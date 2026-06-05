@@ -41,9 +41,9 @@ public class Usuario {
     private String areaEnsino;
     private String formacao;
     private String experiencia;
-    @Column(nullable = true)
+    @Column(nullable = true, length = 500)
     private String bio;
-    @Column(name = "fotoperfil")
+    @Column(name = "fotoperfil", columnDefinition = "TEXT")
     private String fotoPerfil;
     private String status;
     @Column(name = "data_criacao")
