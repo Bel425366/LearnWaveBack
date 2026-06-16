@@ -22,6 +22,7 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_usuario", nullable = false)

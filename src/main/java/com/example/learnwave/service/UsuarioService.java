@@ -5,6 +5,7 @@ import com.example.learnwave.enums.StatusVerificacao;
 import com.example.learnwave.enums.TipoUsuario;
 import com.example.learnwave.model.entity.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioDAO usuarioDAO;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public Usuario criarUsuario(Usuario usuario) {
         try {
@@ -48,6 +51,9 @@ public class UsuarioService {
             
             usuario.setDataCriacao(LocalDateTime.now());
             usuario.setDataAtualizacao(LocalDateTime.now());
+
+            // Criptografar senha antes de salvar
+            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
 
             Usuario usuarioSalvo = usuarioDAO.salvar(usuario);
             System.out.println("Usuário salvo com status: " + usuarioSalvo.getStatusVerificacao());
@@ -93,7 +99,8 @@ public class UsuarioService {
         Usuario usuario = usuarioDAO.buscarPorId(id);
         if (usuario == null) throw new RuntimeException("Usuário não encontrado");
         if (!verificarSenha(senhaAtual, usuario.getSenha())) throw new RuntimeException("Senha atual incorreta");
-        usuarioDAO.atualizarSenha(id, novaSenha);
+        // Salvar nova senha criptografada
+        usuarioDAO.atualizarSenha(id, passwordEncoder.encode(novaSenha));
     }
 
     public Usuario atualizar(Usuario usuario) {
@@ -153,15 +160,38 @@ public class UsuarioService {
     public Usuario autenticar(String email, String senha) {
         Usuario usuario = usuarioDAO.buscarPorEmail(email);
         if (usuario != null && verificarSenha(senha, usuario.getSenha())) {
+            // Migração gradual: se a senha ainda é texto plano, criptografa e salva
+            if (!isBCrypt(usuario.getSenha())) {
+                usuario.setSenha(passwordEncoder.encode(senha));
+                usuario.setDataAtualizacao(LocalDateTime.now());
+                usuarioDAO.atualizar(usuario);
+            }
             return usuario;
         }
         return null;
     }
 
-    private boolean verificarSenha(String senhaPlana, String senhaHash) {
-        // TODO: Implementar verificação de hash da senha (BCrypt, etc.)
-        // Por enquanto, comparação simples para desenvolvimento
-        return senhaPlana.equals(senhaHash);
+    /**
+     * Verifica se a senha informada corresponde à senha armazenada.
+     * Suporta tanto senhas em texto plano (legado) quanto BCrypt (novo).
+     */
+    private boolean verificarSenha(String senhaPlana, String senhaArmazenada) {
+        if (senhaArmazenada == null || senhaPlana == null) return false;
+        
+        // Se a senha armazenada é um hash BCrypt, usa BCrypt para comparar
+        if (isBCrypt(senhaArmazenada)) {
+            return passwordEncoder.matches(senhaPlana, senhaArmazenada);
+        }
+        
+        // Senão, é texto plano (legado) — comparação direta
+        return senhaPlana.equals(senhaArmazenada);
+    }
+
+    /**
+     * Verifica se uma string é um hash BCrypt (começa com $2a$, $2b$ ou $2y$).
+     */
+    private boolean isBCrypt(String senha) {
+        return senha != null && (senha.startsWith("$2a$") || senha.startsWith("$2b$") || senha.startsWith("$2y$"));
     }
 
     public List<Usuario> buscarPorAreaEnsino(String area) {
