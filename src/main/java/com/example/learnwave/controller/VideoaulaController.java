@@ -85,11 +85,12 @@ public class VideoaulaController {
     }
 
     @PatchMapping("/{id}/restaurar")
-    public ResponseEntity<Void> restaurar(@PathVariable Integer id) {
+    public ResponseEntity<Videoaula> restaurar(@PathVariable Integer id) {
         if (!videoaulaService.restaurar(id)) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
+        Videoaula atualizada = videoaulaService.buscarPorId(id);
+        return ResponseEntity.ok(atualizada);
     }
 
     @GetMapping("/lixeira/professor/{professorId}")

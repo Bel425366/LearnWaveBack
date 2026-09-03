@@ -117,13 +117,15 @@ public class MaterialController {
 
     /**
      * Restaura material da lixeira, voltando para RASCUNHO.
+     * Retorna o material atualizado para o front atualizar o estado local.
      */
     @PatchMapping("/{id}/restaurar")
-    public ResponseEntity<Void> restaurar(@PathVariable Integer id) {
+    public ResponseEntity<Material> restaurar(@PathVariable Integer id) {
         if (!materialService.voltarParaRascunho(id)) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
+        Material atualizado = materialService.buscarPorId(id);
+        return ResponseEntity.ok(atualizado);
     }
 
     @GetMapping("/lixeira/professor/{professorId}")

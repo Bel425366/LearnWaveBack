@@ -80,13 +80,15 @@ public class AtividadeController {
 
     /**
      * Restaura atividade da lixeira, voltando para RASCUNHO.
+     * Retorna a atividade atualizada para o front atualizar o estado local.
      */
     @PatchMapping("/{id}/restaurar")
-    public ResponseEntity<Void> restaurar(@PathVariable Integer id) {
+    public ResponseEntity<Atividade> restaurar(@PathVariable Integer id) {
         if (!atividadeService.voltarParaRascunho(id)) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
+        Atividade atualizada = atividadeService.buscarPorId(id);
+        return ResponseEntity.ok(atualizada);
     }
 
     @PatchMapping("/{id}/publicar")
