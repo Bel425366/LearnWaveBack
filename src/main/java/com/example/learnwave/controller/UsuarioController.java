@@ -168,7 +168,7 @@ public class UsuarioController {
 
     // LOGAR usuário
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@RequestParam String email, @RequestParam String senha, @RequestParam(required = false) String tipoUsuario) {
+    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String senha, @RequestParam(required = false) String tipoUsuario) {
         System.out.println("Login attempt - Email: " + email + ", TipoUsuario: " + tipoUsuario);
         
         if (email == null || email.trim().isEmpty()) {
@@ -203,7 +203,26 @@ public class UsuarioController {
         }
 
         System.out.println("Login bem-sucedido para: " + usuario.getEmail());
-        return ResponseEntity.ok(usuario);
+
+        // Retornar dados do usuário sem fotoPerfil para não estourar o localStorage do front
+        java.util.Map<String, Object> resposta = new java.util.HashMap<>();
+        resposta.put("id", usuario.getId());
+        resposta.put("nome", usuario.getNome());
+        resposta.put("email", usuario.getEmail());
+        resposta.put("tipo", usuario.getTipo());
+        resposta.put("status", usuario.getStatus());
+        resposta.put("statusVerificacao", usuario.getStatusVerificacao());
+        resposta.put("cpf", usuario.getCpf());
+        resposta.put("telefone", usuario.getTelefone());
+        resposta.put("escola", usuario.getEscola());
+        resposta.put("areaEnsino", usuario.getAreaEnsino());
+        resposta.put("formacao", usuario.getFormacao());
+        resposta.put("experiencia", usuario.getExperiencia());
+        resposta.put("bio", usuario.getBio());
+        resposta.put("dataCriacao", usuario.getDataCriacao());
+        resposta.put("dataAtualizacao", usuario.getDataAtualizacao());
+        // fotoPerfil omitida intencionalmente — buscar via GET /api/usuarios/{id}/perfil
+        return ResponseEntity.ok(resposta);
     }
 
     // APAGAR usuário
