@@ -142,7 +142,10 @@ public class UsuarioController {
                 usuario.setFotoPerfil(fotoPerfil);
             }
 
-            Usuario atualizado = usuarioService.atualizarPerfil(id, bio, fotoPerfil);
+            String corAvatar = body.get("corAvatar");
+            String emojiAvatar = body.get("emojiAvatar");
+
+            Usuario atualizado = usuarioService.atualizarPerfil(id, bio, fotoPerfil, corAvatar, emojiAvatar);
             return ResponseEntity.ok(atualizado);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro ao atualizar perfil: " + e.getMessage());
@@ -162,6 +165,8 @@ public class UsuarioController {
         perfil.put("email", usuario.getEmail());
         perfil.put("bio", usuario.getBio());
         perfil.put("fotoPerfil", usuario.getFotoPerfil());
+        perfil.put("corAvatar", usuario.getCorAvatar());
+        perfil.put("emojiAvatar", usuario.getEmojiAvatar());
         perfil.put("tipo", usuario.getTipo());
         return ResponseEntity.ok(perfil);
     }

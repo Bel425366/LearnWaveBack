@@ -46,6 +46,10 @@ public class Usuario {
     private String bio;
     @Column(name = "fotoperfil", columnDefinition = "TEXT")
     private String fotoPerfil;
+    @Column(name = "cor_avatar", length = 100)
+    private String corAvatar;
+    @Column(name = "emoji_avatar", length = 20)
+    private String emojiAvatar;
     private String status;
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
@@ -130,6 +134,12 @@ public class Usuario {
 
     public String getFotoPerfil() { return fotoPerfil; }
     public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
+
+    public String getCorAvatar() { return corAvatar; }
+    public void setCorAvatar(String corAvatar) { this.corAvatar = corAvatar; }
+
+    public String getEmojiAvatar() { return emojiAvatar; }
+    public void setEmojiAvatar(String emojiAvatar) { this.emojiAvatar = emojiAvatar; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

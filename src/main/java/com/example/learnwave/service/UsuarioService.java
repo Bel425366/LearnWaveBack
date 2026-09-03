@@ -205,17 +205,15 @@ public class UsuarioService {
         return usuarioDAO.buscarPorStatusVerificacao(status);
     }
 
-    public Usuario atualizarPerfil(Integer id, String bio, String fotoPerfil) {
+    public Usuario atualizarPerfil(Integer id, String bio, String fotoPerfil, String corAvatar, String emojiAvatar) {
         Usuario usuario = usuarioDAO.buscarPorId(id);
         if (usuario == null) {
             throw new RuntimeException("Usuário não encontrado");
         }
-        if (bio != null) {
-            usuario.setBio(bio);
-        }
-        if (fotoPerfil != null) {
-            usuario.setFotoPerfil(fotoPerfil);
-        }
+        if (bio != null) usuario.setBio(bio);
+        if (fotoPerfil != null) usuario.setFotoPerfil(fotoPerfil);
+        if (corAvatar != null) usuario.setCorAvatar(corAvatar);
+        if (emojiAvatar != null) usuario.setEmojiAvatar(emojiAvatar);
         usuario.setDataAtualizacao(LocalDateTime.now());
         return usuarioDAO.atualizar(usuario);
     }
