@@ -19,6 +19,8 @@ public class ProgressoAtividade {
     private StatusProgresso status;
     @Column(precision = 4, scale = 2)
     private BigDecimal nota;
+    @Column(name = "resposta_aluno", columnDefinition = "NVARCHAR(MAX)")
+    private String respostaAluno;
     private Integer tentativas;
     @Column(name = "data_inicio")
     private LocalDateTime dataInicio;
@@ -59,6 +61,9 @@ public class ProgressoAtividade {
 
     public BigDecimal getNota() { return nota; }
     public void setNota(BigDecimal nota) { this.nota = nota; }
+
+    public String getRespostaAluno() { return respostaAluno; }
+    public void setRespostaAluno(String respostaAluno) { this.respostaAluno = respostaAluno; }
 
     public Integer getTentativas() { return tentativas; }
     public void setTentativas(Integer tentativas) { this.tentativas = tentativas; }

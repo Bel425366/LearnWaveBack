@@ -47,8 +47,8 @@ public class ProgressoAtividadeService {
         return progressoAtividadeDAO.atualizar(progresso);
     }
 
-    public void concluirAtividade(Integer id, Double nota) {
-        progressoAtividadeDAO.concluirAtividade(id, nota);
+    public void concluirAtividade(Integer id, Double nota, String respostaAluno) {
+        progressoAtividadeDAO.concluirAtividade(id, nota, respostaAluno);
     }
 
     public ProgressoAtividade buscarPorAlunoEAtividade(Integer alunoId, Integer atividadeId) {

@@ -10,5 +10,5 @@ public interface ProgressoAtividadeDAO {
     List<ProgressoAtividade> listarPorAluno(Integer alunoId);
     List<ProgressoAtividade> listarPorAtividade(Integer atividadeId);
     ProgressoAtividade atualizar(ProgressoAtividade progresso);
-    void concluirAtividade(Integer id, Double nota);
+    void concluirAtividade(Integer id, Double nota, String respostaAluno);
 }

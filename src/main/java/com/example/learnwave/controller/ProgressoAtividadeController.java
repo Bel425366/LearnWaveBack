@@ -48,9 +48,25 @@ public class ProgressoAtividadeController {
         return ResponseEntity.ok(progressoAtualizado);
     }
 
+    /**
+     * Aluno envia resposta dissertativa da atividade.
+     * Salva o texto da resposta e marca como CONCLUIDO com nota 0 (aguardando correção).
+     */
+    @PatchMapping("/{id}/responder")
+    public ResponseEntity<Void> responderAtividade(@PathVariable Integer id, @RequestParam String respostaAluno) {
+        progressoAtividadeService.concluirAtividade(id, 0.0, respostaAluno);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Professor corrige a atividade dissertativa e atribui nota.
+     * Pode opcionalmente atualizar a resposta também.
+     */
     @PatchMapping("/{id}/concluir")
-    public ResponseEntity<Void> concluirAtividade(@PathVariable Integer id, @RequestParam Double nota) {
-        progressoAtividadeService.concluirAtividade(id, nota);
+    public ResponseEntity<Void> concluirAtividade(@PathVariable Integer id,
+                                                   @RequestParam Double nota,
+                                                   @RequestParam(required = false) String respostaAluno) {
+        progressoAtividadeService.concluirAtividade(id, nota, respostaAluno);
         return ResponseEntity.ok().build();
     }
 }

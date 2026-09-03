@@ -43,11 +43,12 @@ public class ProgressoAtividadeDAOImpl implements ProgressoAtividadeDAO {
     }
 
     @Override
-    public void concluirAtividade(Integer id, Double nota) {
+    public void concluirAtividade(Integer id, Double nota, String respostaAluno) {
         ProgressoAtividade progresso = progressoAtividadeRepository.findById(id).orElse(null);
         if (progresso != null) {
             progresso.setStatus(StatusProgresso.CONCLUIDO);
             progresso.setNota(BigDecimal.valueOf(nota));
+            if (respostaAluno != null) progresso.setRespostaAluno(respostaAluno);
             progresso.setDataConclusao(LocalDateTime.now());
             progresso.setDataAtualizacao(LocalDateTime.now());
             progresso.setTentativas(progresso.getTentativas() + 1);
