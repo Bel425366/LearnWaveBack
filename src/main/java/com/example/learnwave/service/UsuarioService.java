@@ -144,7 +144,6 @@ public class UsuarioService {
         return usuarioDAO.buscarProfessoresPendentes();
     }
 
-    @Transactional
     public boolean aprovarProfessor(Integer id) {
         System.out.println("Service: Aprovando professor ID: " + id);
         return usuarioDAO.aprovarProfessor(id);

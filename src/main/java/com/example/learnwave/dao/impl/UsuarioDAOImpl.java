@@ -7,6 +7,7 @@ import com.example.learnwave.model.entity.Usuario;
 import com.example.learnwave.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,33 +97,29 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
+    @Transactional
     public boolean aprovarProfessor(Integer id) {
         System.out.println("Aprovando professor com ID: " + id);
-        Usuario usuario = buscarPorId(id);
-        if (usuario != null) {
-            System.out.println("Usuario encontrado: " + usuario.getEmail() + ", Status atual: " + usuario.getStatusVerificacao());
-            usuario.setStatusVerificacao(StatusVerificacao.APROVADO);
-            usuario.setStatus("ativo");
-            Usuario usuarioSalvo = usuarioRepository.save(usuario);
-            System.out.println("Usuario salvo com status: " + usuarioSalvo.getStatusVerificacao() + ", ativo: " + usuarioSalvo.getStatus());
-            return true;
+        if (!usuarioRepository.existsById(id)) {
+            System.out.println("Usuario nao encontrado com ID: " + id);
+            return false;
         }
-        System.out.println("Usuario nao encontrado com ID: " + id);
-        return false;
+        int rows = usuarioRepository.updateStatusVerificacaoEAtivo(id, StatusVerificacao.APROVADO);
+        System.out.println("Rows atualizadas na aprovação: " + rows);
+        return rows > 0;
     }
 
     @Override
+    @Transactional
     public boolean rejeitarProfessor(Integer id) {
         System.out.println("DAO: Rejeitando professor ID: " + id);
-        Usuario usuario = buscarPorId(id);
-        if (usuario != null) {
-            usuario.setStatusVerificacao(StatusVerificacao.REJEITADO);
-            usuarioRepository.save(usuario);
-            System.out.println("DAO: Professor rejeitado ID: " + id);
-            return true;
+        if (!usuarioRepository.existsById(id)) {
+            System.out.println("DAO: Usuario não encontrado com ID: " + id);
+            return false;
         }
-        System.out.println("DAO: Usuario não encontrado com ID: " + id);
-        return false;
+        int rows = usuarioRepository.updateStatusVerificacao(id, StatusVerificacao.REJEITADO);
+        System.out.println("DAO: Rows atualizadas na rejeição: " + rows);
+        return rows > 0;
     }
 
     @Override
