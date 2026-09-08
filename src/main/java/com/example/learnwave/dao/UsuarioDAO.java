@@ -33,6 +33,9 @@ public interface UsuarioDAO {
     void atualizarNome(Integer id, String nome);
     void atualizarSenha(Integer id, String novaSenha);
 
+    // Recuperação de senha
+    Usuario buscarPorResetToken(String resetToken);
+
     // Estatísticas
     long contarUsuariosPorTipo(TipoUsuario tipo);
     long contarProfessoresPendentes();

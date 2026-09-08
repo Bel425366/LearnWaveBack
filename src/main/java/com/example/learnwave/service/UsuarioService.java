@@ -11,12 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
 
     @Autowired
     private UsuarioDAO usuarioDAO;
+
+    @Autowired
+    private EmailService emailService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -216,5 +220,61 @@ public class UsuarioService {
         if (emojiAvatar != null) usuario.setEmojiAvatar(emojiAvatar);
         usuario.setDataAtualizacao(LocalDateTime.now());
         return usuarioDAO.atualizar(usuario);
+    }
+
+    /**
+     * Gera um token de redefinição de senha e envia o email para o usuário.
+     * Por segurança, não lança erro se o email não existir (evita descobrir emails cadastrados).
+     */
+    public void solicitarResetSenha(String email) {
+        Usuario usuario = usuarioDAO.buscarPorEmail(email);
+        if (usuario == null) {
+            System.out.println("Solicitação de reset para email não cadastrado: " + email);
+            return; // silencioso de propósito
+        }
+
+        String token = UUID.randomUUID().toString();
+        usuario.setResetToken(token);
+        usuario.setResetTokenExpiracao(LocalDateTime.now().plusHours(1));
+        usuario.setDataAtualizacao(LocalDateTime.now());
+        usuarioDAO.atualizar(usuario);
+
+        try {
+            emailService.enviarEmailRecuperacaoSenha(usuario.getEmail(), usuario.getNome(), token);
+            System.out.println("Email de recuperação enviado para: " + usuario.getEmail());
+        } catch (Exception e) {
+            System.err.println("Erro ao enviar email de recuperação: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Não foi possível enviar o email de recuperação. Tente novamente mais tarde.");
+        }
+    }
+
+    /**
+     * Redefine a senha usando o token recebido no email.
+     * Valida se o token existe e ainda não expirou.
+     */
+    public void redefinirSenha(String token, String novaSenha) {
+        if (token == null || token.trim().isEmpty()) {
+            throw new RuntimeException("Token inválido");
+        }
+        if (novaSenha == null || novaSenha.trim().length() < 6) {
+            throw new RuntimeException("A nova senha deve ter no mínimo 6 caracteres");
+        }
+
+        Usuario usuario = usuarioDAO.buscarPorResetToken(token);
+        if (usuario == null) {
+            throw new RuntimeException("Token inválido ou já utilizado");
+        }
+        if (usuario.getResetTokenExpiracao() == null ||
+            usuario.getResetTokenExpiracao().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token expirado. Solicite uma nova recuperação de senha.");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuario.setResetToken(null);
+        usuario.setResetTokenExpiracao(null);
+        usuario.setDataAtualizacao(LocalDateTime.now());
+        usuarioDAO.atualizar(usuario);
+        System.out.println("Senha redefinida com sucesso para: " + usuario.getEmail());
     }
 }

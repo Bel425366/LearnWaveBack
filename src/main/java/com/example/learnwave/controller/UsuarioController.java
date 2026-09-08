@@ -301,7 +301,36 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario.getDocumentoUrl());
     }
 
+    // RECUPERAÇÃO DE SENHA - Etapa 1: usuário solicita o email de recuperação
+    @PostMapping("/esqueceu-senha")
+    public ResponseEntity<?> esqueceuSenha(@RequestBody java.util.Map<String, String> body) {
+        String email = body.get("email");
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("mensagem", "Email é obrigatório"));
+        }
+        try {
+            usuarioService.solicitarResetSenha(email);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body(java.util.Map.of("mensagem", e.getMessage()));
+        }
+        // Sempre retorna sucesso (mesmo se o email não existir) por segurança
+        return ResponseEntity.ok(java.util.Map.of(
+            "mensagem", "Se este email estiver cadastrado, você receberá um link para redefinir a senha."
+        ));
+    }
 
+    // RECUPERAÇÃO DE SENHA - Etapa 2: usuário envia o token e a nova senha
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<?> redefinirSenha(@RequestBody java.util.Map<String, String> body) {
+        String token = body.get("token");
+        String novaSenha = body.get("novaSenha");
+        try {
+            usuarioService.redefinirSenha(token, novaSenha);
+            return ResponseEntity.ok(java.util.Map.of("mensagem", "Senha redefinida com sucesso!"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("mensagem", e.getMessage()));
+        }
+    }
 
     // Validações
     private void validarDadosObrigatorios(Usuario usuario) {

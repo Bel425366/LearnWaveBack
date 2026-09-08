@@ -187,4 +187,9 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             return List.of();
         }
     }
+
+    @Override
+    public Usuario buscarPorResetToken(String resetToken) {
+        return usuarioRepository.findByResetToken(resetToken);
+    }
 }

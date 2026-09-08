@@ -51,6 +51,12 @@ public class Usuario {
     @Column(name = "emoji_avatar", length = 20)
     private String emojiAvatar;
     private String status;
+    @Column(name = "reset_token", length = 100)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String resetToken;
+    @Column(name = "reset_token_expiracao")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private LocalDateTime resetTokenExpiracao;
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
     @Column(name = "data_atualizacao")
@@ -143,6 +149,12 @@ public class Usuario {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getResetToken() { return resetToken; }
+    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+
+    public LocalDateTime getResetTokenExpiracao() { return resetTokenExpiracao; }
+    public void setResetTokenExpiracao(LocalDateTime resetTokenExpiracao) { this.resetTokenExpiracao = resetTokenExpiracao; }
 
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }

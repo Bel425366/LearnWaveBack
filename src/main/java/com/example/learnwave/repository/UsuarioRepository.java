@@ -16,6 +16,7 @@ import java.util.List;
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     Usuario findByEmail(String email);
+    Usuario findByResetToken(String resetToken);
     List<Usuario> findByTipo(TipoUsuario tipo);
     List<Usuario> findByStatus(String status);
     List<Usuario> findByStatusVerificacao(StatusVerificacao statusVerificacao);
