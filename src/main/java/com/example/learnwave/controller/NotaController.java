@@ -39,4 +39,28 @@ public class NotaController {
     public ResponseEntity<Map<String, Object>> obterNotasDetalhadas(@PathVariable Integer alunoId) {
         return ResponseEntity.ok(notaService.obterNotasDetalhadas(alunoId));
     }
+
+    /**
+     * Retorna a média do aluno considerando apenas as atividades de um professor específico.
+     * Usado na área do professor, para ele ver o desempenho do aluno só nas atividades dele.
+     */
+    @GetMapping("/media/{alunoId}/professor/{professorId}")
+    public ResponseEntity<Map<String, Object>> obterMediaPorProfessor(@PathVariable Integer alunoId,
+                                                                       @PathVariable Integer professorId) {
+        BigDecimal media = notaService.calcularMediaAlunoPorProfessor(alunoId, professorId);
+        return ResponseEntity.ok(Map.of(
+            "alunoId", alunoId,
+            "professorId", professorId,
+            "media", media
+        ));
+    }
+
+    /**
+     * Retorna o progresso do aluno considerando apenas as atividades de um professor específico.
+     */
+    @GetMapping("/progresso/{alunoId}/professor/{professorId}")
+    public ResponseEntity<Map<String, Object>> obterProgressoPorProfessor(@PathVariable Integer alunoId,
+                                                                           @PathVariable Integer professorId) {
+        return ResponseEntity.ok(notaService.obterProgressoAlunoPorProfessor(alunoId, professorId));
+    }
 }

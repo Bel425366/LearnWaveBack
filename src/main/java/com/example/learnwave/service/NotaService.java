@@ -68,6 +68,42 @@ public class NotaService {
     }
 
     /**
+     * Calcula a média do aluno considerando apenas as atividades publicadas
+     * de um professor específico. Usado na área do professor.
+     */
+    public BigDecimal calcularMediaAlunoPorProfessor(Integer alunoId, Integer professorId) {
+        BigDecimal media = progressoAtividadeRepository.calcularMediaAlunoPorProfessor(alunoId, professorId);
+        if (media == null) return BigDecimal.ZERO;
+        return media.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Retorna o progresso do aluno considerando apenas as atividades de um professor específico:
+     * - totalAtividades: total de atividades publicadas do professor
+     * - atividadesConcluidas: quantas o aluno concluiu (dentre as do professor)
+     * - percentualConcluido: percentual de conclusão
+     * - media: média das notas nas atividades do professor
+     */
+    public Map<String, Object> obterProgressoAlunoPorProfessor(Integer alunoId, Integer professorId) {
+        Map<String, Object> resultado = new HashMap<>();
+
+        BigDecimal media = calcularMediaAlunoPorProfessor(alunoId, professorId);
+        long concluidas = progressoAtividadeRepository.contarAtividadesConcluidasPorProfessor(alunoId, professorId);
+        long totalAtividades = progressoAtividadeRepository.contarAtividadesPublicadasPorProfessor(professorId);
+
+        double percentual = totalAtividades > 0 ? (double) concluidas / totalAtividades * 100 : 0;
+
+        resultado.put("alunoId", alunoId);
+        resultado.put("professorId", professorId);
+        resultado.put("media", media);
+        resultado.put("totalAtividades", totalAtividades);
+        resultado.put("atividadesConcluidas", concluidas);
+        resultado.put("percentualConcluido", BigDecimal.valueOf(percentual).setScale(1, RoundingMode.HALF_UP));
+
+        return resultado;
+    }
+
+    /**
      * Retorna as notas detalhadas do aluno, indicando quais estão ativas na média.
      */
     public Map<String, Object> obterNotasDetalhadas(Integer alunoId) {

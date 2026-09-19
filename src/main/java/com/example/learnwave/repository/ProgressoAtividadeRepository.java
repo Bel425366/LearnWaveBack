@@ -47,4 +47,42 @@ public interface ProgressoAtividadeRepository extends JpaRepository<ProgressoAti
     @Query("SELECT COUNT(a) FROM Atividade a " +
            "WHERE a.status = com.example.learnwave.enums.StatusConteudo.PUBLICADO")
     long contarAtividadesPublicadasAtivas();
+
+    // ===== Notas POR PROFESSOR =====
+
+    /**
+     * Calcula a média do aluno considerando apenas atividades PUBLICADAS de um professor específico.
+     */
+    @Query("SELECT AVG(pa.nota) FROM ProgressoAtividade pa " +
+           "WHERE pa.alunoId = :alunoId " +
+           "AND pa.nota IS NOT NULL " +
+           "AND pa.atividadeId IN (" +
+           "  SELECT a.id FROM Atividade a " +
+           "  WHERE a.status = com.example.learnwave.enums.StatusConteudo.PUBLICADO " +
+           "  AND a.professorId = :professorId" +
+           ")")
+    BigDecimal calcularMediaAlunoPorProfessor(@Param("alunoId") Integer alunoId,
+                                              @Param("professorId") Integer professorId);
+
+    /**
+     * Conta atividades concluídas pelo aluno em atividades publicadas de um professor específico.
+     */
+    @Query("SELECT COUNT(pa) FROM ProgressoAtividade pa " +
+           "WHERE pa.alunoId = :alunoId " +
+           "AND pa.status = com.example.learnwave.enums.StatusProgresso.CONCLUIDO " +
+           "AND pa.atividadeId IN (" +
+           "  SELECT a.id FROM Atividade a " +
+           "  WHERE a.status = com.example.learnwave.enums.StatusConteudo.PUBLICADO " +
+           "  AND a.professorId = :professorId" +
+           ")")
+    long contarAtividadesConcluidasPorProfessor(@Param("alunoId") Integer alunoId,
+                                                @Param("professorId") Integer professorId);
+
+    /**
+     * Conta total de atividades publicadas de um professor específico.
+     */
+    @Query("SELECT COUNT(a) FROM Atividade a " +
+           "WHERE a.status = com.example.learnwave.enums.StatusConteudo.PUBLICADO " +
+           "AND a.professorId = :professorId")
+    long contarAtividadesPublicadasPorProfessor(@Param("professorId") Integer professorId);
 }
