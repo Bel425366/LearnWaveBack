@@ -18,6 +18,63 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    /**
+     * Executa uma operação de banco com retry automático.
+     * O Somee (plano gratuito) às vezes fecha a conexão no meio da operação
+     * ("Connection is closed"). Quando isso acontece, tentamos de novo:
+     * o Hikari descarta a conexão morta e entrega uma nova.
+     */
+    private <T> T comRetry(java.util.function.Supplier<T> operacao) {
+        int tentativas = 0;
+        int maxTentativas = 4;
+        RuntimeException ultimoErro = null;
+        while (tentativas < maxTentativas) {
+            try {
+                return operacao.get();
+            } catch (RuntimeException e) {
+                ultimoErro = e;
+                if (ehErroDeConexao(e)) {
+                    tentativas++;
+                    System.err.println("Conexao com o banco falhou (tentativa " + tentativas + "/" + maxTentativas + "). Tentando novamente...");
+                    try {
+                        Thread.sleep(800L * tentativas);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    throw e; // erro que não é de conexão (ex: email duplicado) — não repete
+                }
+            }
+        }
+        throw ultimoErro;
+    }
+
+    /**
+     * Verifica se a exceção (ou alguma de suas causas) é um problema de conexão fechada/derrubada.
+     */
+    private boolean ehErroDeConexao(Throwable e) {
+        Throwable atual = e;
+        while (atual != null) {
+            String msg = atual.getMessage();
+            if (msg != null) {
+                String m = msg.toLowerCase();
+                if (m.contains("connection is closed") ||
+                    m.contains("unable to rollback") ||
+                    m.contains("unable to acquire") ||
+                    m.contains("connection is not available") ||
+                    m.contains("the connection is closed") ||
+                    m.contains("connection reset") ||
+                    m.contains("broken pipe") ||
+                    m.contains("socket") ||
+                    m.contains("i/o error")) {
+                    return true;
+                }
+            }
+            atual = atual.getCause();
+        }
+        return false;
+    }
+
     @Override
     public Usuario salvar(Usuario usuario) {
         // Forçar status baseado no tipo
@@ -30,27 +87,27 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             usuario.setStatusVerificacao(StatusVerificacao.PENDENTE);
         }
         
-        return usuarioRepository.save(usuario);
+        return comRetry(() -> usuarioRepository.save(usuario));
     }
 
     @Override
     public Usuario buscarPorId(Integer id) {
-        return usuarioRepository.findById(id).orElse(null);
+        return comRetry(() -> usuarioRepository.findById(id).orElse(null));
     }
 
     @Override
     public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
+        return comRetry(() -> usuarioRepository.findByEmail(email));
     }
 
     @Override
     public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
+        return comRetry(() -> usuarioRepository.findAll());
     }
 
     @Override
     public Usuario atualizar(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+        return comRetry(() -> usuarioRepository.save(usuario));
     }
 
     @Override
@@ -88,12 +145,12 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public boolean existeEmail(String email) {
-        return usuarioRepository.existsByEmail(email);
+        return comRetry(() -> usuarioRepository.existsByEmail(email));
     }
 
     @Override
     public boolean existeCpf(String cpf) {
-        return usuarioRepository.existsByCpf(cpf);
+        return comRetry(() -> usuarioRepository.existsByCpf(cpf));
     }
 
     @Override
