@@ -23,17 +23,17 @@ public class VideoaulaDAOImpl implements VideoaulaDAO {
         videoaula.setDataAtualizacao(LocalDateTime.now());
         // Gerar thumbnail automaticamente a partir do link do YouTube
         videoaula.gerarThumbnailDoYouTube();
-        return videoaulaRepository.save(videoaula);
+        return RetryHelper.comRetry(() -> videoaulaRepository.save(videoaula));
     }
 
     @Override
     public Videoaula buscarPorId(Integer id) {
-        return videoaulaRepository.findById(id).orElse(null);
+        return RetryHelper.comRetry(() -> videoaulaRepository.findById(id).orElse(null));
     }
 
     @Override
     public List<Videoaula> listarTodas() {
-        return videoaulaRepository.findByStatusNot(StatusConteudo.LIXEIRA);
+        return RetryHelper.comRetry(() -> videoaulaRepository.findByStatusNot(StatusConteudo.LIXEIRA));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class VideoaulaDAOImpl implements VideoaulaDAO {
         videoaula.setDataAtualizacao(LocalDateTime.now());
         // Regerar thumbnail se URL mudou
         videoaula.gerarThumbnailDoYouTube();
-        return videoaulaRepository.save(videoaula);
+        return RetryHelper.comRetry(() -> videoaulaRepository.save(videoaula));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class VideoaulaDAOImpl implements VideoaulaDAO {
         // Soft delete: mover para lixeira
         v.setStatus(StatusConteudo.LIXEIRA);
         v.setDataAtualizacao(LocalDateTime.now());
-        videoaulaRepository.save(v);
+        RetryHelper.comRetry(() -> videoaulaRepository.save(v));
         return true;
     }
 
@@ -76,7 +76,7 @@ public class VideoaulaDAOImpl implements VideoaulaDAO {
         if (v == null) return false;
         v.setStatus(StatusConteudo.PUBLICADO);
         v.setDataAtualizacao(LocalDateTime.now());
-        videoaulaRepository.save(v);
+        RetryHelper.comRetry(() -> videoaulaRepository.save(v));
         return true;
     }
 
@@ -86,7 +86,7 @@ public class VideoaulaDAOImpl implements VideoaulaDAO {
         if (v == null) return false;
         v.setStatus(StatusConteudo.ARQUIVADO);
         v.setDataAtualizacao(LocalDateTime.now());
-        videoaulaRepository.save(v);
+        RetryHelper.comRetry(() -> videoaulaRepository.save(v));
         return true;
     }
 
@@ -96,7 +96,7 @@ public class VideoaulaDAOImpl implements VideoaulaDAO {
         if (v == null) return false;
         v.setStatus(StatusConteudo.RASCUNHO);
         v.setDataAtualizacao(LocalDateTime.now());
-        videoaulaRepository.save(v);
+        RetryHelper.comRetry(() -> videoaulaRepository.save(v));
         return true;
     }
 

@@ -21,17 +21,17 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         if (atividade.getStatus() == null) atividade.setStatus(StatusConteudo.RASCUNHO);
         atividade.setDataCriacao(LocalDateTime.now());
         atividade.setDataAtualizacao(LocalDateTime.now());
-        return atividadeRepository.save(atividade);
+        return RetryHelper.comRetry(() -> atividadeRepository.save(atividade));
     }
 
     @Override
     public Atividade buscarPorId(Integer id) {
-        return atividadeRepository.findById(id).orElse(null);
+        return RetryHelper.comRetry(() -> atividadeRepository.findById(id).orElse(null));
     }
 
     @Override
     public List<Atividade> listarTodas() {
-        return atividadeRepository.findByStatusNot(StatusConteudo.LIXEIRA);
+        return RetryHelper.comRetry(() -> atividadeRepository.findByStatusNot(StatusConteudo.LIXEIRA));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class AtividadeDAOImpl implements AtividadeDAO {
             if (atividade.getStatus() == null) atividade.setStatus(existente.getStatus());
         }
         atividade.setDataAtualizacao(LocalDateTime.now());
-        return atividadeRepository.save(atividade);
+        return RetryHelper.comRetry(() -> atividadeRepository.save(atividade));
     }
 
     @Override
@@ -52,7 +52,7 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         // Soft delete: mover para lixeira
         a.setStatus(StatusConteudo.LIXEIRA);
         a.setDataAtualizacao(LocalDateTime.now());
-        atividadeRepository.save(a);
+        RetryHelper.comRetry(() -> atividadeRepository.save(a));
         return true;
     }
 
@@ -86,7 +86,7 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         if (a == null) return false;
         a.setStatus(StatusConteudo.PUBLICADO);
         a.setDataAtualizacao(LocalDateTime.now());
-        atividadeRepository.save(a);
+        RetryHelper.comRetry(() -> atividadeRepository.save(a));
         return true;
     }
 
@@ -96,7 +96,7 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         if (a == null) return false;
         a.setStatus(StatusConteudo.ARQUIVADO);
         a.setDataAtualizacao(LocalDateTime.now());
-        atividadeRepository.save(a);
+        RetryHelper.comRetry(() -> atividadeRepository.save(a));
         return true;
     }
 
@@ -106,7 +106,7 @@ public class AtividadeDAOImpl implements AtividadeDAO {
         if (a == null) return false;
         a.setStatus(StatusConteudo.RASCUNHO);
         a.setDataAtualizacao(LocalDateTime.now());
-        atividadeRepository.save(a);
+        RetryHelper.comRetry(() -> atividadeRepository.save(a));
         return true;
     }
 

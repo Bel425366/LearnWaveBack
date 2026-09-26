@@ -25,17 +25,17 @@ public class MaterialDAOImpl implements MaterialDAO {
         if (material.getStatus() == null) material.setStatus(StatusConteudo.RASCUNHO);
         material.setDataCriacao(LocalDateTime.now());
         material.setDataAtualizacao(LocalDateTime.now());
-        return materialRepository.save(material);
+        return RetryHelper.comRetry(() -> materialRepository.save(material));
     }
 
     @Override
     public Material buscarPorId(Integer id) {
-        return materialRepository.findById(id).orElse(null);
+        return RetryHelper.comRetry(() -> materialRepository.findById(id).orElse(null));
     }
 
     @Override
     public List<Material> listarTodos() {
-        return materialRepository.findByStatusNot(StatusConteudo.LIXEIRA);
+        return RetryHelper.comRetry(() -> materialRepository.findByStatusNot(StatusConteudo.LIXEIRA));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MaterialDAOImpl implements MaterialDAO {
             if (material.getStatus() == null) material.setStatus(existente.getStatus());
         }
         material.setDataAtualizacao(LocalDateTime.now());
-        return materialRepository.save(material);
+        return RetryHelper.comRetry(() -> materialRepository.save(material));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class MaterialDAOImpl implements MaterialDAO {
         // Soft delete: mover para lixeira
         m.setStatus(StatusConteudo.LIXEIRA);
         m.setDataAtualizacao(LocalDateTime.now());
-        materialRepository.save(m);
+        RetryHelper.comRetry(() -> materialRepository.save(m));
         return true;
     }
 
@@ -76,7 +76,7 @@ public class MaterialDAOImpl implements MaterialDAO {
         if (m == null) return false;
         m.setStatus(StatusConteudo.PUBLICADO);
         m.setDataAtualizacao(LocalDateTime.now());
-        materialRepository.save(m);
+        RetryHelper.comRetry(() -> materialRepository.save(m));
         return true;
     }
 
@@ -86,7 +86,7 @@ public class MaterialDAOImpl implements MaterialDAO {
         if (m == null) return false;
         m.setStatus(StatusConteudo.ARQUIVADO);
         m.setDataAtualizacao(LocalDateTime.now());
-        materialRepository.save(m);
+        RetryHelper.comRetry(() -> materialRepository.save(m));
         return true;
     }
 
@@ -96,7 +96,7 @@ public class MaterialDAOImpl implements MaterialDAO {
         if (m == null) return false;
         m.setStatus(StatusConteudo.RASCUNHO);
         m.setDataAtualizacao(LocalDateTime.now());
-        materialRepository.save(m);
+        RetryHelper.comRetry(() -> materialRepository.save(m));
         return true;
     }
 
