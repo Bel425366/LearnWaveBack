@@ -72,12 +72,14 @@ public class MaterialDAOImpl implements MaterialDAO {
 
     @Override
     public boolean publicar(Integer id) {
-        Material m = buscarPorId(id);
-        if (m == null) return false;
-        m.setStatus(StatusConteudo.PUBLICADO);
-        m.setDataAtualizacao(LocalDateTime.now());
-        RetryHelper.comRetry(() -> materialRepository.save(m));
-        return true;
+        return RetryHelper.comRetry(() -> {
+            Material m = materialRepository.findById(id).orElse(null);
+            if (m == null) return false;
+            m.setStatus(StatusConteudo.PUBLICADO);
+            m.setDataAtualizacao(LocalDateTime.now());
+            materialRepository.save(m);
+            return true;
+        });
     }
 
     @Override
